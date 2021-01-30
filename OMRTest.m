@@ -1,28 +1,28 @@
 clc, clear, close all;
-tic 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%         PHASE ZERO: INPUT FILES          %%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%-------------------- Flute/Violin (G) ---------------------------
-inputImg =  imread('camptown.jpg');    
-% inputImg =  imread('child.jpg');      
+tic 
+%---------------------- Flute/Violin (G) ---------------------------
+% inputImg =  imread('camptown.jpg');    
 % inputImg =  imread('matilda.jpg');      
+% inputImg =  imread('child.jpg');
 % inputImg =  imread('sunshine.jpg');   
 % ----------------------------------------------------------------
 %---------------------- Piano (G,F) ------------------------------
-% inputImg =  imread('america2.jpg');       %/
-% inputImg = imread('Burleske.jpg');        %/
-% inputImg =  imread('canon1.jpg');         %/    
-% inputImg =  imread('canon2.jpg');         %/
-% inputImg =  imread('furelise.jpg');       %/
-% inputImg =  imread('minuet.jpg');         %/
-% inputImg =  imread('odePiano.jpg');       %/
-% inputImg =  imread('mac.jpg');            %/
-% inputImg =  imread('saints_.jpg');         %/
-% inputImg =  imread('turk_Page_1.jpg');    %/
-% inputImg =  imread('turk_Page_2.jpg');    %/
-% inputImg =  imread('Grace2.jpg');      
+% inputImg =  imread('Grace2.jpg');         
+% inputImg =  imread('america2.jpg');       
+% inputImg = imread('Burleske.jpg');         
+% inputImg =  imread('canon1.jpg');             
+% inputImg =  imread('canon2.jpg');         
+% inputImg =  imread('furelise.jpg');       
+inputImg =  imread('minuet.jpg');         
+% inputImg =  imread('odePiano.jpg');       
+% inputImg =  imread('mac.jpg');            
+% inputImg =  imread('saints_.jpg');        
+% inputImg =  imread('turk_Page_1.jpg');    
+% inputImg =  imread('turk_Page_2.jpg');    
 % -----------------------------------------------------------------
 %---------------------- Viola (C) ---------------------------------
 % inputImg =  imread('patrol.jpg');
@@ -32,7 +32,7 @@ inputImg =  imread('camptown.jpg');
 % ---------------------- Cello/Trombone (F) ------------------------
 % inputImg = imread('sweetheart.jpg');
 % inputImg = imread('jolly2.jpg');
-% inputImg = imread('johnny.jpg');
+% inputImg = imread('pomp.jpg');
 %------------------------------------------------------------------
 
 
@@ -53,26 +53,25 @@ img_no_staff = staffRemove(img_bw, staffLines, staffHeights, spaceHeight);
 
 % Part 2.2: Importing dataset for template matching
 clef = readDataset('clefs');
-key = readDataset('keys');
+key = readDataset('accidentals');
+% key = readDataset('keys');
 timeSig = readDataset('timeSignatures');
 closedNotes = readDataset('closedNotes');
 wholeNotes = readDataset('whole');
-stemmedNotes = readDataset('stemmed'); 
-accidental = readDataset('accidentals');
+% stemmedNotes = readDataset('stemmed'); 
 dot = readDataset('dots');
 rest = readDataset('rests');
 other = readDataset('others');
-combinedSyms = [accidental; rest; other];
+combined = [key; rest; other];
 
 
+dir = 'C:\Projects\FinalProject\Working\AudioTest\AudioTest.sdk\AudioTest_v1\src\';
 outFile1 = 'sheetNotes.h';
-fullFile = strcat('C:\Projects\FinalProject\Working\AudioTest',...
-    '\AudioTest.sdk\AudioTest_v1\src\', outFile1);
+fullFile = strcat(dir, outFile1);
 fid1 = fopen(fullFile, 'w');
 
 outFile2 = 'sheetBeat.h';
-fullFile = strcat('C:\Projects\FinalProject\Working\AudioTest',...
-    '\AudioTest.sdk\AudioTest_v1\src\', outFile2);
+fullFile = strcat(dir, outFile2);
 fid2 = fopen(fullFile, 'w');
 
 fprintf(fid1,'#include "notes.h"\n\n');
@@ -81,18 +80,18 @@ fprintf(fid1,'int noteArray[][9] = \n{\n');
 % fprintf(fid,'#include "notes.h"\n\n');
 fprintf(fid2,'double beatArray[] = \n{\n\t');
 
-figure;
+% figure;
 totalTimeSignature = [];
 for i = 1:length(sections)
     fprintf("-----------------------------------------------------------------\n");
     fprintf("    Section %d symbols: \n", i);
-    imshow(sections{i}); impixelinfo; 
+%     imshow(sections{i}); impixelinfo; 
 
     % Part 2.3: Clef detection
     [clefs, clefBound]  = detectClefs(sections{i}, spaceHeight, ... 
         newStaffLines{i}, clef);
     disp(clefs);
-
+%     pause;
     % Part 2.4: Key signature detection
     if (i == 1)
         [keySignature, keys, keyTemp] = detectKeySig(sections{i}, spaceHeight, ...
@@ -136,7 +135,7 @@ for i = 1:length(sections)
         spaceHeight, lineHeight);    
     % Part 2.9: Other symbol detection (rests, dots, ties, slurs, barlines)
     [otherSymbols, ledgerLineLocs3] = detectOtherSymbols(otherSymsSec, ...
-        nextBound, spaceHeight, newStaffLines{i}, combinedSyms, dot);
+        nextBound, spaceHeight, newStaffLines{i}, combined, dot);
     ledgerLineLocs = sort([ledgerLineLocs1; ledgerLineLocs2; ...
         ledgerLineLocs3]);
     
@@ -145,16 +144,14 @@ for i = 1:length(sections)
     totalSyms = [unbeamedNotes; beamedNotes; otherSymbols];
     totalSyms = sortrows(totalSyms, 6);
     disp(totalSyms);
-    pause;
-    %
-    
+%     pause;
+
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     %%%%%%%    PHASES 3/4: MUSIC SYMBOL RECONSTRUCTION    %%%%%%
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-    %
+
     % Part 3.1 Calculating ledger/staff lines and staff space locations,
     % and assigning appropriate pitches
-    %
     [ledgerStaffSpace, pitch, note, pitchPreKS, staffCenters, keyType, ...
         keySigIdx, staffDivider] = finalStaffPitchAssignment(...
         sections{i}, newStaffLines{i}, ledgerLineLocs, clefs, keys);
@@ -168,10 +165,10 @@ for i = 1:length(sections)
             pitch, note, pitchPreKS, staffCenters, keyType, keySigIdx, spaceHeight, ...
             lineHeight, fid1, fid2);        
     end
-
+    %}
 %     pause;
     clc;
-    hold off;
+%     hold off;
 end
 
 fprintf(fid1,'};');

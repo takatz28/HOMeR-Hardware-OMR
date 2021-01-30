@@ -1,15 +1,21 @@
 function [newSection] = beamSegmentation(section, spaceHeight)
  
-    tempOpen = imopen(~section, strel('disk', floor(spaceHeight * 0.5)));
+    tempOpen = imopen(~section, strel('diamond', floor(0.5*spaceHeight)));
     tempOpen = imdilate(tempOpen, strel('square', 1));
     tempOpen = xor(section, ~tempOpen);
 %     imshow(tempOpen); pause;
 
     beamBuf = imopen(tempOpen, strel('line', floor(0.4*spaceHeight), 90));
-%     imshow(~beamBuf); pause;
+    cc = bwconncomp(beamBuf);
     
-	stats = regionprops(beamBuf, {'BoundingBox'}); 
-	boxes = [];
+% 	stats = regionprops(beamBuf, {'BoundingBox'}); 
+	stats = regionprops(beamBuf, 'BoundingBox', 'Area'); 
+	idx = find([stats.Area] > spaceHeight);
+    cc2 = ismember(labelmatrix(cc), idx);
+	stats = regionprops(cc2, 'BoundingBox'); 
+%     imshowpair(~cc2, section);
+
+    boxes = [];
 %         hold on;
 %         hold off;
 	for j=1:numel(stats)
@@ -18,7 +24,7 @@ function [newSection] = beamSegmentation(section, spaceHeight)
 		w = ceil(z(1))+z(3);
 		boxHeight = ceil(z(2)):h;
 		boxWidth = ceil(z(1)):w;
-		if (z(3) > spaceHeight)
+% 		if (z(3) > spaceHeight)
 % 			boxes = [boxes; ceil(z(2)) h ceil(z(1))-5 w+5];
 %                 rectangle('Position',stats(j).BoundingBox, ...
 %                     'EdgeColor','r', 'LineWidth',2);
@@ -32,9 +38,9 @@ function [newSection] = beamSegmentation(section, spaceHeight)
 			else
 				boxes = [boxes; ceil(z(2)) h ceil(z(1))-5 w+5];
 			end
-		else
-			beamBuf(boxHeight,boxWidth) = 0;
-		end
+% 		else
+% 			beamBuf(boxHeight,boxWidth) = 0;
+% 		end
 	end
 	beamBuf = beamBuf(1:size(section,1),1:size(section,2));        
 	sectionNoBeam = or(section, beamBuf);

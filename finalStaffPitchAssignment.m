@@ -20,7 +20,7 @@ function [ledgerStaffSpace, pitch, note, pitchPreKeySig, staffCenters, ...
     
 %     figure;
 %     hold on
-    imshowpair(xor(staffCopy, ledgerCopy), section); %pause;
+%     imshowpair(xor(staffCopy, ledgerCopy), section); %pause;
 
     % Part 2: Generate reference note array
     noteRefArr = [];

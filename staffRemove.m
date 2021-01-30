@@ -42,8 +42,8 @@ function [imgNoStaff] = staffRemove(img_bw, staffLines, staffHeights, spaceHeigh
 %             imshow(tempImg); pause;
             tempImg2(boxHeight2, boxWidth2) = tempImg(boxHeight2, boxWidth2);
 
-            rectangle('Position',stats(i).BoundingBox, ...
-                    'EdgeColor','r', 'LineWidth',2)
+%             rectangle('Position',stats(i).BoundingBox, ...
+%                     'EdgeColor','r', 'LineWidth',2)
 %                 [stats(i).Eccentricity stats(i).Area ...
 %                     stats(i).Circularity] 
 %             pause

@@ -224,24 +224,30 @@ function [symbols] = readDataset(set)
     dot3 = imread('dataset\dots\dot3.bmp');
     dot4 = imread('dataset\dots\dot4.bmp');
     dot5 = imread('dataset\dots\dot5.bmp');
-    dots = {dot1, dot2, dot3, dot4, dot5};
+    dot6 = imread('dataset\dots\dot6.bmp');
+    dots = {dot1, dot2, dot3, dot4, dot5, dot6};
     category(:,1:length(dots)) = {'augmentation'};        
     type(:,1:length(dots)) = {'dot'};        
-    value = {0, 0, 0, 0, 0};
+    value = {0, 0, 0, 0, 0, 0};
     dotSyms = [dots' category' type' value'];   
     %----------------------------------------------------
     
     %----------------------------------------------------
     % read accidentals (5)
-    flat = imread('dataset\accidental\flat.bmp');
-    sharp = imread('dataset\accidental\sharp.bmp');
+    category = {};
+    flat1 = imread('dataset\accidental\flat1.bmp');
+    flat2 = imread('dataset\accidental\flat2.bmp');
+    sharp1 = imread('dataset\accidental\sharp1.bmp');
+    sharp2 = imread('dataset\accidental\sharp2.bmp');
     natural = imread('dataset\accidental\natural.bmp');
-    doubleFlat = imread('dataset\accidental\doubleFlat.bmp');
-    doubleSharp = imread('dataset\accidental\doubleSharp.bmp');
-    accidentals = {flat, sharp, natural, doubleFlat, doubleSharp};
+%     doubleFlat = imread('dataset\accidental\doubleFlat.bmp');
+%     doubleSharp = imread('dataset\accidental\doubleSharp.bmp');
+    accidentals = {flat1, flat2, sharp1, sharp2, natural}; %, doubleFlat, ...
+%         doubleSharp};
     category(:,1:length(accidentals)) = {'accidental'};
-	type = {'flat', 'sharp', 'natural', 'doubleFlat', 'doubleSharp'};
-    pitch = {-1, 1, 0, -2, 2};
+	type = {'flat', 'flat', 'sharp', 'sharp', 'natural'}; %'doubleFlat', ...
+%        'doubleSharp'};
+    pitch = {-1, -1, 1, 1, 0}; %, -2, 2};
     accidentalSyms = [accidentals', category', type', pitch'];    
     %----------------------------------------------------
     
@@ -298,7 +304,7 @@ function [symbols] = readDataset(set)
     % Group open and closed notes together
     openNoteSyms = [wholeNotes; halfNotes];
     closedNoteSyms = [quarterNotes; notes8; notes16; notes32; notes64];
-    stemmedNoteSyms = [halfNotes; closedNoteSyms];
+%     stemmedNoteSyms = [halfNotes; closedNoteSyms];
     %----------------------------------------------------
     
     %-----------------------------------------------------------------    
@@ -313,8 +319,8 @@ function [symbols] = readDataset(set)
         symbols = openNoteSyms;
     elseif (strcmpi(set,'closedNotes'))
         symbols = closedNoteSyms;
-    elseif (strcmpi(set,'stemmed'))
-        symbols = stemmedNoteSyms;
+%     elseif (strcmpi(set,'stemmed'))
+%         symbols = stemmedNoteSyms;
     elseif (strcmpi(set,'whole'))
         symbols = wholeNotes;
     elseif (strcmpi(set,'rests'))
