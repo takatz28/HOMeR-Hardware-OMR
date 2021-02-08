@@ -1,0 +1,1 @@
+--relax --debug typical --mt auto -L xil_defaultlib -L xlconcat_v2_1_3 -L xilinx_vip -L unisims_ver -L unimacro_ver -L secureip -L xpm --snapshot test xil_defaultlib.test xil_defaultlib.glbl -log elaborate.log
