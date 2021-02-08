@@ -1,0 +1,7 @@
+Running: xsim.dir/organ_tb_behav/xsimk.exe -simmode gui -wdb organ_tb_behav.wdb -simrunnum 0 -socket 65463
+Design successfully loaded
+Design Loading Memory Usage: 6232 KB (Peak: 6232 KB)
+Design Loading CPU Usage: 62 ms
+Simulation completed
+Simulation Memory Usage: 15256 KB (Peak: 15256 KB)
+Simulation CPU Usage: 181015 ms
