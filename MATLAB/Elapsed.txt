@@ -1,0 +1,30 @@
+         C:\Projects\FinalProject\Prototype\testImages\America2.jpg: 6.251673
+        C:\Projects\FinalProject\Prototype\testImages\auldPiano.jpg: 5.327711
+           C:\Projects\FinalProject\Prototype\testImages\battle.jpg: 3.159566
+         C:\Projects\FinalProject\Prototype\testImages\burleske.jpg: 5.122504
+         C:\Projects\FinalProject\Prototype\testImages\camptown.jpg: 3.992402
+   C:\Projects\FinalProject\Prototype\testImages\canon_d_Page_1.jpg: 6.964817
+   C:\Projects\FinalProject\Prototype\testImages\canon_d_Page_2.jpg: 6.584229
+   C:\Projects\FinalProject\Prototype\testImages\canon_d_Page_3.jpg: 7.728732
+   C:\Projects\FinalProject\Prototype\testImages\canon_d_Page_4.jpg: 6.667740
+         C:\Projects\FinalProject\Prototype\testImages\furelise.jpg: 5.865058
+    C:\Projects\FinalProject\Prototype\testImages\Grace3_Page_1.jpg: 6.218195
+    C:\Projects\FinalProject\Prototype\testImages\Grace3_Page_2.jpg: 4.091005
+     C:\Projects\FinalProject\Prototype\testImages\Greensleeves.jpg: 5.838482
+             C:\Projects\FinalProject\Prototype\testImages\hall.jpg: 5.789704
+C:\Projects\FinalProject\Prototype\testImages\Hallelujah_Page_1.jpg: 8.061607
+C:\Projects\FinalProject\Prototype\testImages\Hallelujah_Page_2.jpg: 4.903469
+          C:\Projects\FinalProject\Prototype\testImages\johnny2.jpg: 5.041861
+           C:\Projects\FinalProject\Prototype\testImages\jolly2.jpg: 4.854682
+              C:\Projects\FinalProject\Prototype\testImages\mac.jpg: 5.260736
+          C:\Projects\FinalProject\Prototype\testImages\matilda.jpg: 5.310044
+           C:\Projects\FinalProject\Prototype\testImages\minuet.jpg: 5.435176
+         C:\Projects\FinalProject\Prototype\testImages\odePiano.jpg: 6.271433
+           C:\Projects\FinalProject\Prototype\testImages\patrol.jpg: 6.656554
+          C:\Projects\FinalProject\Prototype\testImages\saints_.jpg: 5.506921
+           C:\Projects\FinalProject\Prototype\testImages\silent.jpg: 5.509307
+         C:\Projects\FinalProject\Prototype\testImages\sunshine.jpg: 3.196959
+       C:\Projects\FinalProject\Prototype\testImages\sweetheart.jpg: 7.160594
+      C:\Projects\FinalProject\Prototype\testImages\turk_Page_1.jpg: 6.009381
+      C:\Projects\FinalProject\Prototype\testImages\turk_Page_2.jpg: 5.928319
+          C:\Projects\FinalProject\Prototype\testImages\twinkle.jpg: 2.704594
