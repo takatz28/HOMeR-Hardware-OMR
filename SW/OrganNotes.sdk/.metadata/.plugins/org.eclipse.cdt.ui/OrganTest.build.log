@@ -1,0 +1,23 @@
+12:48:26 **** Incremental Build of configuration Debug for project OrganTest ****
+make pre-build main-build 
+a9-linaro-pre-build-step
+' '
+'Building file: ../src/intc_handler.c'
+'Invoking: ARM v7 gcc compiler'
+arm-none-eabi-gcc -Wall -O0 -g3 -c -fmessage-length=0 -MT"src/intc_handler.o" -mcpu=cortex-a9 -mfpu=vfpv3 -mfloat-abi=hard -I../../OrganTest_bsp/ps7_cortexa9_0/include -MMD -MP -MF"src/intc_handler.d" -MT"src/intc_handler.o" -o "src/intc_handler.o" "../src/intc_handler.c"
+'Finished building: ../src/intc_handler.c'
+' '
+'Building target: OrganTest.elf'
+'Invoking: ARM v7 gcc linker'
+arm-none-eabi-gcc -mcpu=cortex-a9 -mfpu=vfpv3 -mfloat-abi=hard -Wl,-build-id=none -specs=Xilinx.spec -Wl,-T -Wl,../src/lscript.ld -L../../OrganTest_bsp/ps7_cortexa9_0/lib -o "OrganTest.elf"  ./src/audio.o ./src/init.o ./src/intc_handler.o ./src/test.o   -Wl,--start-group,-lxil,-lgcc,-lc,--end-group
+'Finished building target: OrganTest.elf'
+' '
+'Invoking: ARM v7 Print Size'
+arm-none-eabi-size OrganTest.elf  |tee "OrganTest.elf.size"
+   text	   data	    bss	    dec	    hex	filename
+  77620	  23832	  23536	 124988	  1e83c	OrganTest.elf
+'Finished building: OrganTest.elf.size'
+' '
+
+12:48:27 Build Finished (took 1s.93ms)
+
