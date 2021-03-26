@@ -1,6 +1,13 @@
-`timescale 1ns / 1ps
-
+/*************************************************************************
+ * Module name:		fcw_table
+ * Input arg(s):	FCW address
+ * Output arg(s):	Equivalent FCW
+ * Description:		Lookup table for the frequency control word based on
+ *					the input note
+ *************************************************************************/
+ `timescale 1ns / 1ps
 module fcw_table(
+	// port declarations
     input [6:0] fcw_addr,
     output reg [23:0] fcw
     );

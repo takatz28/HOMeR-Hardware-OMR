@@ -1,6 +1,14 @@
+/*************************************************************************
+ * Module name:		tri_table
+ * Input arg(s):	12-bit address
+ * Output arg(s):	Triangle wave sample
+ * Description:		Lookup table for triangle waveform generation
+ *************************************************************************/
+ 
 `timescale 1ns / 1ps
 
 module tri_table (
+	// port declarations
 	input [11:0] tri_addr,
 	output reg [15:0] tri_word
 	);
