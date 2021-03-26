@@ -117,7 +117,7 @@ function [otherSymsArr, newSection] = otherSymsHorz(section, stats, ...
                     % In the case of flat symbol, the hole is extracted 
                     % to be used in phase 3
                     if (strcmp(cell2mat(combinedSyms(idx,3)), 'flat'))
-                        flatImg = ones(size(tempImg));
+                        flatImg = ones(size(section));
                         flatImg(boxHeight1, boxWidth1) = section(...
                             boxHeight1, boxWidth1);
                         flatImg = ~xor(imfill(~flatImg, 'holes'), flatImg);
