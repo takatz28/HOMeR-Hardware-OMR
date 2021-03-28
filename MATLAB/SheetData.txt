@@ -1,0 +1,374 @@
+
+User selected C:\Users\tacat\Documents\GitHub\OMR\testImages\Grace3_Page_1.jpg
+User selected C:\Users\tacat\Documents\GitHub\OMR\testImages\Grace3_Page_2.jpg
+----------------------------------------------------------------------------------------------------
+Scanning Grace3_Page_1.jpg ...
+----------------------------------------------------------------------------------------------------
+SECTION 1:
+Clefs: treble clef, bass clef,
+Key signature: F#/D#m,
+Time signature: 3/4,
+Symbols:
+	wholehalf rest
+	wholehalf rest
+	quarter note
+	single barline
+	half note
+	half note
+	half note
+	half note
+	augmentation dot
+	augmentation dot
+	augmentation dot
+	8th note
+	8th note
+	single barline
+	natural accidental
+	half note
+	half note
+	half note
+	half note
+	augmentation dot
+	augmentation dot
+	augmentation dot
+	quarter note
+	single barline
+	half note
+	half note
+	half note
+	half note
+	augmentation dot
+	augmentation dot
+	augmentation dot
+	quarter note
+	single barline
+----------------------------------------------------------------------------------------------------
+SECTION 2:
+Clefs: treble clef, bass clef,
+Key signature: F#/D#m,
+Symbols:
+	half note
+	half note
+	half note
+	half note
+	natural accidental
+	natural accidental
+	quarter note
+	quarter note
+	quarter note
+	quarter note
+	single barline
+	half note
+	half note
+	half note
+	half note
+	augmentation dot
+	augmentation dot
+	augmentation dot
+	8th note
+	8th note
+	single barline
+	half note
+	half note
+	half note
+	half note
+	quarter note
+	quarter note
+	quarter note
+	quarter note
+	single barline
+	half note
+	half note
+	half note
+	half note
+	tie 
+	augmentation dot
+	augmentation dot
+	augmentation dot
+	augmentation dot
+	single barline
+	half note
+	half note
+	half note
+	half note
+	augmentation dot
+	augmentation dot
+	augmentation dot
+	quarter note
+	single barline
+----------------------------------------------------------------------------------------------------
+SECTION 3:
+Clefs: treble clef, bass clef,
+Key signature: F#/D#m,
+Symbols:
+	half note
+	half note
+	half note
+	half note
+	augmentation dot
+	augmentation dot
+	augmentation dot
+	8th note
+	8th note
+	single barline
+	natural accidental
+	half note
+	half note
+	half note
+	half note
+	augmentation dot
+	augmentation dot
+	augmentation dot
+	quarter note
+	single barline
+	half note
+	half note
+	half note
+	half note
+	augmentation dot
+	augmentation dot
+	augmentation dot
+	quarter note
+	single barline
+	half note
+	half note
+	half note
+	half note
+	quarter note
+	quarter note
+	quarter note
+	quarter note
+	single barline
+----------------------------------------------------------------------------------------------------
+SECTION 4:
+Clefs: bass clef, treble clef,
+Key signature: F#/D#m,
+Symbols:
+	half note
+	half note
+	half note
+	half note
+	natural accidental
+	quarter note
+	quarter note
+	quarter note
+	8th note
+	8th note
+	single barline
+	half note
+	half note
+	half note
+	half note
+	augmentation dot
+	augmentation dot
+	augmentation dot
+	quarter note
+	single barline
+	half note
+	quarter note
+	quarter note
+	tie 
+	augmentation dot
+	quarter note
+	quarter note
+	quarter note
+	quarter note
+	single barline
+	quarter note
+	quarter note
+	quarter note
+	quarter note
+	augmentation dot
+	augmentation dot
+	augmentation dot
+	augmentation dot
+	8th rest
+	8th rest
+	quarter note
+	quarter note
+	single barline
+----------------------------------------------------------------------------------------------------
+SECTION 5:
+Clefs: treble clef, bass clef,
+Key signature: F#/D#m,
+Symbols:
+	half note
+	half note
+	8th note
+	8th note
+	8th note
+	8th note
+	single barline
+	half note
+	half note
+	quarter note
+	quarter note
+	single barline
+	half note
+	half note
+	quarter note
+	quarter note
+	single barline
+	half note
+	half note
+	quarter note
+	quarter note
+	quarter note
+	single barline
+	half note
+	half note
+	half note
+	augmentation dot
+	augmentation dot
+	8th note
+	8th note
+	single barline
+----------------------------------------------------------------------------------------------------
+Scanning Grace3_Page_2.jpg ...
+----------------------------------------------------------------------------------------------------
+SECTION 6:
+Clefs: treble clef, bass clef,
+Key signature: F#/D#m,
+Symbols:
+	half note
+	half note
+	half note
+	half note
+	quarter note
+	quarter note
+	quarter note
+	quarter note
+	single barline
+	half note
+	half note
+	half note
+	half note
+	tie 
+	augmentation dot
+	augmentation dot
+	augmentation dot
+	augmentation dot
+	single barline
+	half note
+	half note
+	half note
+	half note
+	augmentation dot
+	augmentation dot
+	augmentation dot
+	quarter note
+	single barline
+	half note
+	half note
+	half note
+	quarter note
+	augmentation dot
+	augmentation dot
+	augmentation dot
+	augmentation dot
+	8th note
+	8th note
+	8th note
+	single barline
+	natural accidental
+	half note
+	half note
+	half note
+	half note
+	augmentation dot
+	augmentation dot
+	augmentation dot
+	quarter note
+	single barline
+----------------------------------------------------------------------------------------------------
+SECTION 7:
+Clefs: bass clef, treble clef,
+Key signature: F#/D#m,
+Symbols:
+	half note
+	half note
+	half note
+	quarter note
+	augmentation dot
+	augmentation dot
+	augmentation dot
+	augmentation dot
+	8th note
+	8th note
+	8th note
+	single barline
+	half note
+	half note
+	half note
+	half note
+	quarter note
+	quarter note
+	quarter note
+	quarter note
+	single barline
+	half note
+	half note
+	half note
+	half note
+	natural accidental
+	quarter note
+	quarter note
+	quarter note
+	8th note
+	8th note
+	single barline
+	half note
+	half note
+	half note
+	half note
+	quarter note
+	quarter note
+	quarter note
+	quarter note
+	single barline
+----------------------------------------------------------------------------------------------------
+SECTION 8:
+Clefs: treble clef, bass clef,
+Key signature: F#/D#m,
+Symbols:
+	natural accidental
+	natural accidental
+	half note
+	half note
+	half note
+	half note
+	tie 
+	augmentation dot
+	augmentation dot
+	augmentation dot
+	augmentation dot
+	single barline
+	natural accidental
+	natural accidental
+	half note
+	half note
+	half note
+	half note
+	half note
+	tie 
+	augmentation dot
+	augmentation dot
+	augmentation dot
+	augmentation dot
+	augmentation dot
+	single barline
+	half note
+	half note
+	half note
+	half note
+	half note
+	augmentation dot
+	augmentation dot
+	augmentation dot
+	augmentation dot
+	augmentation dot
+	double barline
+----------------------------------------------------------------------------------------------------
+Elapsed time: 15.961277 seconds
+----------------------------------------------------------------------------------------------------
+Please open Xilinx SDK to listen to the tune.

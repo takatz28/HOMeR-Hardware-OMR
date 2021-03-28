@@ -1,11 +1,11 @@
 clc, clear, close all;
 
-dir = 'C:\Projects\FinalProject\Prototype\OrganNotes.sdk\OrganTest\src\';
-outFile1 = 'sheetNotes4.h';
+dir = 'OrganNotes.sdk\Synthesizer\src\';
+outFile1 = 'sheetNotes.h';
 fullFile = strcat(dir, outFile1);
 fid1 = fopen(fullFile, 'w');
 
-outFile2 = 'sheetBeat4.h';
+outFile2 = 'sheetBeat.h';
 fullFile = strcat(dir, outFile2);
 fid2 = fopen(fullFile, 'w');
 
