@@ -160,19 +160,19 @@ function [unbeamedNotes, ledgerLineLocs] = detectUnbeamedNotes(...
                     if (flagCount >= 0 && flagCount <= 4)
                         if (flagCount == 0)
                             noteType = 'quarter';
-                            noteVal = 1;
+                            noteVal = 0.25;
                         elseif (flagCount == 1)
                             noteType = '8th';
-                            noteVal = 0.5;
+                            noteVal = 0.125;
                         elseif (flagCount == 2)
                             noteType = '16th';
-                            noteVal = 0.25;
+                            noteVal = 0.0625;
                         elseif (flagCount == 3)
                             noteType = '32nd';
-                            noteVal = 0.125;
+                            noteVal = 0.03125;
                         elseif (flagCount == 4)
                             noteType = '64th';
-                            noteVal = 0.0625;         
+                            noteVal = 0.015625;         
                         end
                         % Count the number of noteheads detected in
                         % the isolated note/chord
@@ -229,7 +229,7 @@ function [unbeamedNotes, ledgerLineLocs] = detectUnbeamedNotes(...
                             w2]};
                         category(symCount) = {'note'};
                         type(symCount) = {'half'};
-                        value(symCount) = {2};
+                        value(symCount) = {0.5};
                         symIdx(symCount) = {ceil(z2(1))};
                         symCount = symCount + 1;
                         if (debug == 1)
@@ -261,7 +261,7 @@ function [unbeamedNotes, ledgerLineLocs] = detectUnbeamedNotes(...
                     loc(symCount) = {[ceil(z2(2)) h2 ceil(z2(1)) w2]};
                     category(symCount) = {'note'};
                     type(symCount) = {'whole'};
-                    value(symCount) = {4};
+                    value(symCount) = {1};
                         symIdx(symCount) = {ceil(z2(1))};
                     symCount = symCount + 1;   
                     if (debug == 1)

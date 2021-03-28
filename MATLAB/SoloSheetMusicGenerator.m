@@ -81,11 +81,12 @@ function SoloSheetMusicGenerator(totalSyms, totalTimeSignature, ...
                         % If the location is the third staffline, the rest
                         % is a half rest
                         if (idx2 == 3)
-                            tempBeat = 2;
+                            tempBeat = 0.5;
                         % On the other hand, if location is second staff-
                         % line, the rest if a whole rest
                         elseif (idx2 == 2)
-                            tempBeat = cell2mat(totalTimeSignature(:,5));                                
+                            temp = strsplit(string(totalTimeSignature(1,4)),'/');
+                            tempBeat = str2double(temp(1))/str2double(temp(2));
                         end
                     % For the rest of the staff lines, use the default 
                     % value    

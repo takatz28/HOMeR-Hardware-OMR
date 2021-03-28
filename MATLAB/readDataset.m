@@ -74,7 +74,7 @@ function [clefSyms, accidentalSyms, timeSigSyms, wholeNotes, restSyms, ...
 		'6/8', '9/8', '12/8', '4/4', '2/2', '2/2', '2/2'};
 	beat = {2, 2, 2, 2, 3, 3, 3, 3, 3, 3, ...
 		3, 4, 4, 4, 4, 4, 5, 3, 6, ...
-		6, 9, 12, 4, 4, 4, 4};
+		6, 9, 12, 4, 2, 2, 2};
 	timeSigSyms = [timeSig' category' type' beat'];    
 	%----------------------------------------------------
 
@@ -89,7 +89,7 @@ function [clefSyms, accidentalSyms, timeSigSyms, wholeNotes, restSyms, ...
 		whole{i} = img;
 		category(i) = {'note'};
 		type(i) = {'whole'};
-		beat(i) = {4};
+		beat(i) = {1};
 	end
 	wholeNotes = [whole' category' type' beat'];
 	%----------------------------------------------------
@@ -107,7 +107,7 @@ function [clefSyms, accidentalSyms, timeSigSyms, wholeNotes, restSyms, ...
 	rests = {rest12, rest4_1, rest4_2, rest8, rest16, rest32, rest64};
 	category(:,1:length(rests)) = {'rest'};        
 	type = {'wholehalf', 'quarter', 'quarter', '8th', '16th', '32nd', '64th'};  
-	beat = {0, 1, 1, 0.5, 0.25, 0.125, 0.0625};
+	beat = {1, 0.25, 0.25, 0.125, 0.0625, 0.03125, 0.015625};
 	restSyms = [rests', category', type', beat'];
 	%----------------------------------------------------
 

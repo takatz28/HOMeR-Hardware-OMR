@@ -46,16 +46,16 @@ function PianoSheetMusicGenerator(totalSyms, totalTimeSignature, ...
                 noteRestBarIdx(ii))));
             if (wholeHalfIdx == 2 || wholeHalfIdx == 7)
                 if (isempty(totalTimeSignature))
-                    totalSyms(noteRestBarIdx(ii),5) = {4};
+                    totalSyms(noteRestBarIdx(ii),5) = {1};
                 else                        
-                    totalSyms(noteRestBarIdx(ii),5) = totalTimeSignature(...
-                        1,5);
+                    temp = strsplit(string(totalTimeSignature(1,4)),'/');
+                    temp2 = str2double(temp(1))/str2double(temp(2));
+                    totalSyms(noteRestBarIdx(ii),5) = {temp2};
                 end
                 wholeCount = wholeCount + 1;
                 wholeArr = [wholeArr; noteRestBarIdx(ii)];
             elseif (wholeHalfIdx == 3 || wholeHalfIdx == 8)
-                totalSyms(noteRestBarIdx(ii),5) = {2};
-%                     noteRestBars(ii,:)
+                totalSyms(noteRestBarIdx(ii),5) = {0.5};
             end
         elseif (strcmp(cell2mat(noteRestBars(ii,3)),'barline'))
             if (wholeCount == 1)
