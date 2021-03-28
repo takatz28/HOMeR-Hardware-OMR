@@ -1806,3 +1806,96 @@ make pre-build main-build
 a9-linaro-pre-build-step
 ' '
 make: Nothing to be done for 'main-build'.
+01:24:12 **** Clean-only build of configuration Debug for project Synthesizer ****
+make clean 
+rm -rf  ./src/audio.o ./src/init.o ./src/intc_handler.o ./src/test.o  ./src/audio.d ./src/init.d ./src/intc_handler.d ./src/test.d  Synthesizer.elf.size  Synthesizer.elf
+' '
+01:24:12 **** Auto Build of configuration Debug for project Synthesizer ****
+make pre-build main-build 
+a9-linaro-pre-build-step
+' '
+'Building file: ../src/audio.c'
+'Invoking: ARM v7 gcc compiler'
+arm-none-eabi-gcc -Wall -O0 -g3 -c -fmessage-length=0 -MT"src/audio.o" -mcpu=cortex-a9 -mfpu=vfpv3 -mfloat-abi=hard -I../../Synthesizer_bsp/ps7_cortexa9_0/include -MMD -MP -MF"src/audio.d" -MT"src/audio.o" -o "src/audio.o" "../src/audio.c"
+'Finished building: ../src/audio.c'
+' '
+'Building file: ../src/driver.c'
+'Invoking: ARM v7 gcc compiler'
+arm-none-eabi-gcc -Wall -O0 -g3 -c -fmessage-length=0 -MT"src/driver.o" -mcpu=cortex-a9 -mfpu=vfpv3 -mfloat-abi=hard -I../../Synthesizer_bsp/ps7_cortexa9_0/include -MMD -MP -MF"src/driver.d" -MT"src/driver.o" -o "src/driver.o" "../src/driver.c"
+'Finished building: ../src/driver.c'
+' '
+'Building file: ../src/init.c'
+'Invoking: ARM v7 gcc compiler'
+arm-none-eabi-gcc -Wall -O0 -g3 -c -fmessage-length=0 -MT"src/init.o" -mcpu=cortex-a9 -mfpu=vfpv3 -mfloat-abi=hard -I../../Synthesizer_bsp/ps7_cortexa9_0/include -MMD -MP -MF"src/init.d" -MT"src/init.o" -o "src/init.o" "../src/init.c"
+../src/init.c: In function 'Timer_Init':
+../src/init.c:48:31: warning: passing argument 2 of 'XTmrCtr_SetHandler' from incompatible pointer type [-Wincompatible-pointer-types]
+  XTmrCtr_SetHandler(&TMRInst, TMR_Intr_Handler, &TMRInst);
+                               ^~~~~~~~~~~~~~~~
+In file included from ../src/init.h:14,
+                 from ../src/init.c:5:
+../../Synthesizer_bsp/ps7_cortexa9_0/include/xtmrctr.h:317:64: note: expected 'XTmrCtr_Handler' {aka 'void (*)(void *, unsigned char)'} but argument is of type 'void (*)(void *)'
+ void XTmrCtr_SetHandler(XTmrCtr * InstancePtr, XTmrCtr_Handler FuncPtr,
+                                                ~~~~~~~~~~~~~~~~^~~~~~~
+'Finished building: ../src/init.c'
+' '
+'Building file: ../src/intc_handler.c'
+'Invoking: ARM v7 gcc compiler'
+arm-none-eabi-gcc -Wall -O0 -g3 -c -fmessage-length=0 -MT"src/intc_handler.o" -mcpu=cortex-a9 -mfpu=vfpv3 -mfloat-abi=hard -I../../Synthesizer_bsp/ps7_cortexa9_0/include -MMD -MP -MF"src/intc_handler.d" -MT"src/intc_handler.o" -o "src/intc_handler.o" "../src/intc_handler.c"
+'Finished building: ../src/intc_handler.c'
+' '
+'Building target: Synthesizer.elf'
+'Invoking: ARM v7 gcc linker'
+arm-none-eabi-gcc -mcpu=cortex-a9 -mfpu=vfpv3 -mfloat-abi=hard -Wl,-build-id=none -specs=Xilinx.spec -Wl,-T -Wl,../src/lscript.ld -L../../Synthesizer_bsp/ps7_cortexa9_0/lib -o "Synthesizer.elf"  ./src/audio.o ./src/driver.o ./src/init.o ./src/intc_handler.o   -Wl,--start-group,-lxil,-lgcc,-lc,--end-group
+'Finished building target: Synthesizer.elf'
+' '
+'Invoking: ARM v7 Print Size'
+arm-none-eabi-size Synthesizer.elf  |tee "Synthesizer.elf.size"
+   text	   data	    bss	    dec	    hex	filename
+  48356	   5320	  23480	  77156	  12d64	Synthesizer.elf
+'Finished building: Synthesizer.elf.size'
+' '
+01:24:17 **** Auto Build of configuration Debug for project Synthesizer ****
+make pre-build main-build 
+a9-linaro-pre-build-step
+' '
+'Building file: ../src/driver.c'
+'Invoking: ARM v7 gcc compiler'
+arm-none-eabi-gcc -Wall -O0 -g3 -c -fmessage-length=0 -MT"src/driver.o" -mcpu=cortex-a9 -mfpu=vfpv3 -mfloat-abi=hard -I../../Synthesizer_bsp/ps7_cortexa9_0/include -MMD -MP -MF"src/driver.d" -MT"src/driver.o" -o "src/driver.o" "../src/driver.c"
+'Finished building: ../src/driver.c'
+' '
+'Building target: Synthesizer.elf'
+'Invoking: ARM v7 gcc linker'
+arm-none-eabi-gcc -mcpu=cortex-a9 -mfpu=vfpv3 -mfloat-abi=hard -Wl,-build-id=none -specs=Xilinx.spec -Wl,-T -Wl,../src/lscript.ld -L../../Synthesizer_bsp/ps7_cortexa9_0/lib -o "Synthesizer.elf"  ./src/audio.o ./src/driver.o ./src/init.o ./src/intc_handler.o   -Wl,--start-group,-lxil,-lgcc,-lc,--end-group
+'Finished building target: Synthesizer.elf'
+' '
+'Invoking: ARM v7 Print Size'
+arm-none-eabi-size Synthesizer.elf  |tee "Synthesizer.elf.size"
+   text	   data	    bss	    dec	    hex	filename
+  48356	   5320	  23480	  77156	  12d64	Synthesizer.elf
+'Finished building: Synthesizer.elf.size'
+' '
+01:26:49 **** Auto Build of configuration Debug for project Synthesizer ****
+make pre-build main-build 
+a9-linaro-pre-build-step
+' '
+'Building file: ../src/intc_handler.c'
+'Invoking: ARM v7 gcc compiler'
+arm-none-eabi-gcc -Wall -O0 -g3 -c -fmessage-length=0 -MT"src/intc_handler.o" -mcpu=cortex-a9 -mfpu=vfpv3 -mfloat-abi=hard -I../../Synthesizer_bsp/ps7_cortexa9_0/include -MMD -MP -MF"src/intc_handler.d" -MT"src/intc_handler.o" -o "src/intc_handler.o" "../src/intc_handler.c"
+'Finished building: ../src/intc_handler.c'
+' '
+'Building target: Synthesizer.elf'
+'Invoking: ARM v7 gcc linker'
+arm-none-eabi-gcc -mcpu=cortex-a9 -mfpu=vfpv3 -mfloat-abi=hard -Wl,-build-id=none -specs=Xilinx.spec -Wl,-T -Wl,../src/lscript.ld -L../../Synthesizer_bsp/ps7_cortexa9_0/lib -o "Synthesizer.elf"  ./src/audio.o ./src/driver.o ./src/init.o ./src/intc_handler.o   -Wl,--start-group,-lxil,-lgcc,-lc,--end-group
+'Finished building target: Synthesizer.elf'
+' '
+'Invoking: ARM v7 Print Size'
+arm-none-eabi-size Synthesizer.elf  |tee "Synthesizer.elf.size"
+   text	   data	    bss	    dec	    hex	filename
+  48356	   5584	  23480	  77420	  12e6c	Synthesizer.elf
+'Finished building: Synthesizer.elf.size'
+' '
+01:26:53 **** Incremental Build of configuration Debug for project Synthesizer ****
+make pre-build main-build 
+a9-linaro-pre-build-step
+' '
+make: Nothing to be done for 'main-build'.

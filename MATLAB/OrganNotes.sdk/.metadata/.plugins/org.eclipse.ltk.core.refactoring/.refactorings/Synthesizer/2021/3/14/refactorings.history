@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<session version="1.0">
+<refactoring comment="Rename resource &apos;Synthesizer/src/test.c&apos; to &apos;driver.c&apos;" description="Rename resource &apos;test.c&apos;" flags="7" id="org.eclipse.ltk.core.refactoring.rename.resource" input="src/test.c" name="driver.c" stamp="1616919851872" updateReferences="true"/>
+</session>

@@ -8,8 +8,8 @@
 
 #include "intc_handler.h"
 #include "audio.h"
-#include "sheetBeat20.h"
-#include "sheetNotes20.h"
+#include "sheetBeat.h"
+#include "sheetNotes.h"
 //#include "song3_1.h"
 
 #define LENGTH 	sizeof(beatArray)/sizeof(beatArray[0])

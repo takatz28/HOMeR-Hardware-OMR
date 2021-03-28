@@ -8,21 +8,21 @@ LD_SRCS += \
 
 C_SRCS += \
 ../src/audio.c \
+../src/driver.c \
 ../src/init.c \
-../src/intc_handler.c \
-../src/test.c 
+../src/intc_handler.c 
 
 OBJS += \
 ./src/audio.o \
+./src/driver.o \
 ./src/init.o \
-./src/intc_handler.o \
-./src/test.o 
+./src/intc_handler.o 
 
 C_DEPS += \
 ./src/audio.d \
+./src/driver.d \
 ./src/init.d \
-./src/intc_handler.d \
-./src/test.d 
+./src/intc_handler.d 
 
 
 # Each subdirectory must supply rules for building sources it contributes

@@ -1,5 +1,5 @@
-src/test.o src/test.o: ../src/test.c ../src/intc_handler.h ../src/init.h \
- ../../Synthesizer_bsp/ps7_cortexa9_0/include/xparameters.h \
+src/driver.o src/driver.o: ../src/driver.c ../src/intc_handler.h \
+ ../src/init.h ../../Synthesizer_bsp/ps7_cortexa9_0/include/xparameters.h \
  ../../Synthesizer_bsp/ps7_cortexa9_0/include/xparameters_ps.h \
  ../../Synthesizer_bsp/ps7_cortexa9_0/include/xgpio.h \
  ../../Synthesizer_bsp/ps7_cortexa9_0/include/xil_types.h \
