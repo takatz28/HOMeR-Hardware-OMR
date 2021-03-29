@@ -153,7 +153,7 @@ function [clefSyms, accidentalSyms, timeSigSyms, wholeNotes, restSyms, ...
 		other{i} = img;
 		category(i) = {''};
 		type(i) = {'fermata'};
-		beat(i) = {2.25};
+		beat(i) = {2};
 	end	
 	otherSyms = [other' category' type' beat'];  
 	%----------------------------------------------------
