@@ -21,12 +21,12 @@ function OMR(inputImg, fid1, fid2)
     [clef, key, timeSig, wholeNotes, rest, dot, other, tieslur] = readDataset;
     combined = [key; rest; other];
     %
-%     figure;
+    figure;
     totalTimeSignature = [];
     for i = 1:length(sections)
         fprintf("-----------------------------------------------------------------\n");
         fprintf("    Section %d symbols: \n", i);
-%         imshow(sections{i}); impixelinfo; 
+        imshow(sections{i}); pause;
 
         % Part 2.3: Clef detection
         [clefs, clefBound]  = detectClefs(sections{i}, spaceHeight, ... 
@@ -113,7 +113,7 @@ function OMR(inputImg, fid1, fid2)
                 lineHeight, fid1, fid2);        
         end
         %}
-%         pause;
+        pause;
     end
     %
 end
