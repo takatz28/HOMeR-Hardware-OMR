@@ -1,0 +1,973 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>PianoSheetMusicGenerator</title><meta name="generator" content="MATLAB 9.9"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2021-04-02"><meta name="DC.source" content="PianoSheetMusicGenerator.m"><style type="text/css">
+html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}:focus{outine:0}ins{text-decoration:none}del{text-decoration:line-through}table{border-collapse:collapse;border-spacing:0}
+
+html { min-height:100%; margin-bottom:1px; }
+html body { height:100%; margin:0px; font-family:Arial, Helvetica, sans-serif; font-size:10px; color:#000; line-height:140%; background:#fff none; overflow-y:scroll; }
+html body td { vertical-align:top; text-align:left; }
+
+h1 { padding:0px; margin:0px 0px 25px; font-family:Arial, Helvetica, sans-serif; font-size:1.5em; color:#d55000; line-height:100%; font-weight:normal; }
+h2 { padding:0px; margin:0px 0px 8px; font-family:Arial, Helvetica, sans-serif; font-size:1.2em; color:#000; font-weight:bold; line-height:140%; border-bottom:1px solid #d6d4d4; display:block; }
+h3 { padding:0px; margin:0px 0px 5px; font-family:Arial, Helvetica, sans-serif; font-size:1.1em; color:#000; font-weight:bold; line-height:140%; }
+
+a { color:#005fce; text-decoration:none; }
+a:hover { color:#005fce; text-decoration:underline; }
+a:visited { color:#004aa0; text-decoration:none; }
+
+p { padding:0px; margin:0px 0px 20px; }
+img { padding:0px; margin:0px 0px 20px; border:none; }
+p img, pre img, tt img, li img, h1 img, h2 img { margin-bottom:0px; }
+
+ul { padding:0px; margin:0px 0px 20px 23px; list-style:square; }
+ul li { padding:0px; margin:0px 0px 7px 0px; }
+ul li ul { padding:5px 0px 0px; margin:0px 0px 7px 23px; }
+ul li ol li { list-style:decimal; }
+ol { padding:0px; margin:0px 0px 20px 0px; list-style:decimal; }
+ol li { padding:0px; margin:0px 0px 7px 23px; list-style-type:decimal; }
+ol li ol { padding:5px 0px 0px; margin:0px 0px 7px 0px; }
+ol li ol li { list-style-type:lower-alpha; }
+ol li ul { padding-top:7px; }
+ol li ul li { list-style:square; }
+
+.content { font-size:1.2em; line-height:140%; padding: 20px; }
+
+pre, code { font-size:12px; }
+tt { font-size: 1.2em; }
+pre { margin:0px 0px 20px; }
+pre.codeinput { padding:10px; border:1px solid #d3d3d3; background:#f7f7f7; }
+pre.codeoutput { padding:10px 11px; margin:0px 0px 20px; color:#4c4c4c; }
+pre.error { color:red; }
+
+@media print { pre.codeinput, pre.codeoutput { word-wrap:break-word; width:100%; } }
+
+span.keyword { color:#0000FF }
+span.comment { color:#228B22 }
+span.string { color:#A020F0 }
+span.untermstring { color:#B20000 }
+span.syscmd { color:#B28C00 }
+span.typesection { color:#A0522D }
+
+.footer { width:auto; padding:10px 0px; margin:25px 0px 0px; border-top:1px dotted #878787; font-size:0.8em; line-height:140%; font-style:italic; color:#878787; text-align:left; float:none; }
+.footer p { margin:0px; }
+.footer a { color:#878787; }
+.footer a:hover { color:#878787; text-decoration:underline; }
+.footer a:visited { color:#878787; }
+
+table th { padding:7px 5px; text-align:left; vertical-align:middle; border: 1px solid #d6d4d4; font-weight:bold; }
+table td { padding:7px 5px; text-align:left; vertical-align:top; border:1px solid #d6d4d4; }
+
+
+
+
+
+  </style></head><body><div class="content"><pre class="codeinput"><span class="comment">%-------------------------------------------------------------------------</span>
+<span class="comment">% Function name:    PianoSheetMusicGenerator</span>
+<span class="comment">% Input arg(s):     ledger/staff/space locations, pre/post-key pitches and</span>
+<span class="comment">%                   notes, total symbol list, space/line heights, time and</span>
+<span class="comment">%                   key signature array, note/beat file IDs</span>
+<span class="comment">% Description:      Produces a note and beat array based on the recon-</span>
+<span class="comment">%                   struction of the musical symbols on a piano section</span>
+<span class="comment">%-------------------------------------------------------------------------</span>
+<span class="keyword">function</span> PianoSheetMusicGenerator(totalSyms, totalTimeSignature, <span class="keyword">...</span>
+    ledgerStaffSpace, pitch, note, pitchPreKS, staffCenters, keyType, <span class="keyword">...</span>
+    keySigIdx, spaceHeight, lineHeight, fid1, fid2)
+
+
+    <span class="comment">% Generate reference indices for subsequent symbol locations</span>
+    totalSymsIdx = 1:length(totalSyms);
+    symbolLocs = cell2mat(totalSyms(:,2));
+    symbolCat = string(totalSyms(:,3));
+    <span class="comment">% Get indices of note/rest/barline symbols</span>
+    noteRestBarIdx = find(strcmp(symbolCat,<span class="string">"note"</span>) | <span class="keyword">...</span>
+        strcmp(symbolCat,<span class="string">"rest"</span>) | <span class="keyword">...</span>
+        strcmp(symbolCat,<span class="string">"barline"</span>));
+    noteRestBars = totalSyms(noteRestBarIdx,:);
+    <span class="comment">% Get indices of symbols that are not note/rest/barline</span>
+    nonNoteIdx = totalSymsIdx(~ismember(totalSymsIdx, noteRestBarIdx));
+    nonNoteSyms = totalSyms(nonNoteIdx,:);
+
+    <span class="comment">% Calculate reference centroids</span>
+    h1 = symbolLocs(:,1);
+    h2 = symbolLocs(:,2);
+    w1 = symbolLocs(:,3);
+    w2 = symbolLocs(:,4);
+    cent_x = (w1+w2)./2;
+    cent_y = (h1+h2)./2;
+
+    <span class="comment">%------------------------------------------------------------------</span>
+    <span class="comment">% Preprocessing: single whole rest in a measure is removed from</span>
+    <span class="comment">% note/rest assignment; if two whole rests in one measure, keep the</span>
+    <span class="comment">% first one and remove the second one</span>
+    <span class="comment">%------------------------------------------------------------------</span>
+    wholeCount = 0;
+    wholeArr = [];
+    visited = [];
+    <span class="keyword">for</span> ii = 1:length(noteRestBarIdx)
+        <span class="keyword">if</span> (strcmp(cell2mat(noteRestBars(ii,4)),<span class="string">'wholehalf'</span>))
+            [~, wholeHalfIdx] = min(abs(staffCenters - cent_y(<span class="keyword">...</span>
+                noteRestBarIdx(ii))));
+            <span class="keyword">if</span> (wholeHalfIdx == 2 || wholeHalfIdx == 7)
+                <span class="keyword">if</span> (isempty(totalTimeSignature))
+                    totalSyms(noteRestBarIdx(ii),5) = {1};
+                <span class="keyword">else</span>
+                    temp = strsplit(string(totalTimeSignature(1,4)),<span class="string">'/'</span>);
+                    temp2 = str2double(temp(1))/str2double(temp(2));
+                    totalSyms(noteRestBarIdx(ii),5) = {temp2};
+                <span class="keyword">end</span>
+                wholeCount = wholeCount + 1;
+                wholeArr = [wholeArr; noteRestBarIdx(ii)];
+            <span class="keyword">elseif</span> (wholeHalfIdx == 3 || wholeHalfIdx == 8)
+                totalSyms(noteRestBarIdx(ii),5) = {0.5};
+            <span class="keyword">end</span>
+        <span class="keyword">elseif</span> (strcmp(cell2mat(noteRestBars(ii,3)),<span class="string">'barline'</span>))
+            <span class="keyword">if</span> (wholeCount == 1)
+                visited = [visited; wholeArr(1)];
+            <span class="keyword">elseif</span> (wholeCount == 2)
+                visited = [visited; wholeArr(2)];
+            <span class="keyword">end</span>
+            wholeCount = 0;
+            wholeArr = [];
+        <span class="keyword">end</span>
+    <span class="keyword">end</span>
+
+    <span class="comment">% Modifiable buffers for pitch and note</span>
+    measurePitch = pitch;
+    measureNote = note;
+
+    <span class="comment">% Array initializers</span>
+    tiePresent = [];
+    totalNotes = [];
+    totalBeat = [];
+
+    <span class="comment">% Process individual symbol detected by phase 2</span>
+    <span class="keyword">for</span> j = 1:size(totalSyms, 1)
+        <span class="comment">% Performs a type check if the symbol is either a note, rest,</span>
+        <span class="comment">% or barline</span>
+        isNote = strcmp(cell2mat(totalSyms(j,3)),<span class="string">'note'</span>);
+        isRest = strcmp(cell2mat(totalSyms(j,3)),<span class="string">'rest'</span>);
+        isBar = strcmp(cell2mat(totalSyms(j,3)),<span class="string">'barline'</span>);
+
+        <span class="comment">% If current symbol has already been processed, skip processing</span>
+        <span class="keyword">if</span>(ismember(j, sort(visited)))
+            <span class="keyword">continue</span>;
+        <span class="keyword">else</span>
+            <span class="comment">% In the case of piano sheets, a maximum of eight notes can</span>
+            <span class="comment">% be played simultaneously</span>
+            noteBuf = string(zeros(1,8));
+            <span class="comment">% Add current symbol index to visited array</span>
+            visited = [visited; j];
+            <span class="keyword">if</span> (isNote || isRest)
+                <span class="comment">% Calculate location of staff/ledger/space closest to</span>
+                <span class="comment">% symbol centroid</span>
+                [~, idx] = min(abs(ledgerStaffSpace - cent_y(j)));
+                <span class="keyword">if</span> (isNote)
+                    <span class="comment">% If symbol is a note, temporary pitch/note is based</span>
+                    <span class="comment">% on buffer values, while beat is based on default</span>
+                    tempPitch = measurePitch(idx);
+                    tempNote = measureNote(idx);
+                <span class="keyword">elseif</span> (isRest)
+                    <span class="comment">% If symbol is a rest, pitch is set to 0,</span>
+                    tempPitch = 0;
+                    tempNote = string(pitchTranslator(tempPitch));
+                <span class="keyword">end</span>
+                <span class="comment">% Set beat to default/assigned value</span>
+                tempBeat = cell2mat(totalSyms(j,5));
+
+
+                <span class="comment">%------------------------------------------------------</span>
+                <span class="comment">% Accidental locator and pitch re-assignment</span>
+                <span class="comment">% - Accidentals are typically located on the left-hand</span>
+                <span class="comment">%   side of notes</span>
+                <span class="comment">% - Modifies the note's pitch based on conditions</span>
+                <span class="comment">%------------------------------------------------------</span>
+                <span class="comment">% Find possible accidental on the note's LHS</span>
+                accidentalIdx = find((<span class="keyword">...</span>
+                    abs(cent_x(nonNoteIdx) - cent_x(j)) &lt; 5*spaceHeight) &amp; <span class="keyword">...</span>
+                    (abs(cent_y(nonNoteIdx) - cent_y(j)) &lt; 7*lineHeight) &amp; <span class="keyword">...</span>
+                    (cent_x(nonNoteIdx) &lt; cent_x(j)));
+                <span class="comment">% Ensures that the located symbol is indeed an</span>
+                <span class="comment">% accidental</span>
+                accidentalIdx = accidentalIdx(find(strcmp(string(<span class="keyword">...</span>
+                    nonNoteSyms(accidentalIdx,3)), <span class="string">"accidental"</span>)));
+                <span class="keyword">if</span> (~isempty(accidentalIdx))
+                    <span class="comment">% Returns the index of the staff/space/ledger</span>
+                    <span class="comment">% centroid closest to the accidental</span>
+                    [~, tempIdx] = min(abs(ledgerStaffSpace - cent_y(<span class="keyword">...</span>
+                        nonNoteIdx(accidentalIdx))));
+                    <span class="comment">% Natural accidental case: its value depends on current</span>
+                    <span class="comment">% line pitch</span>
+                    <span class="keyword">if</span> (strcmp(string(nonNoteSyms(accidentalIdx, 4)),<span class="keyword">...</span>
+                            <span class="string">"natural"</span>))
+                        <span class="comment">% if natural is found in a line with a sharp key,</span>
+                        <span class="comment">% or buffered pitch is higher than original pitch,</span>
+                        <span class="comment">% current pitch will be decreased by 1</span>
+                        <span class="keyword">if</span> ((ismember(tempIdx, keySigIdx) &amp;&amp; strcmp(<span class="keyword">...</span>
+                            keyType, <span class="string">"sharp"</span>)) || (measurePitch(<span class="keyword">...</span>
+                            tempIdx) &gt; pitchPreKS(tempIdx)))
+                            tempPitch = tempPitch - 1;
+                        <span class="comment">% if natural is found in a line with a flat key,</span>
+                        <span class="comment">% or buffered pitch is lower than original pitch,</span>
+                        <span class="comment">% current pitch will be increased by 1</span>
+                        <span class="keyword">elseif</span> ((ismember(tempIdx, keySigIdx) &amp;&amp; strcmp(<span class="keyword">...</span>
+                            keyType, <span class="string">"flat"</span>)) || (measurePitch(<span class="keyword">...</span>
+                            tempIdx) &lt; pitchPreKS(tempIdx)))
+                            tempPitch = tempPitch + 1;
+                        <span class="keyword">end</span>
+                    <span class="comment">% For flat/sharp, use default value</span>
+                    <span class="keyword">else</span>
+                        tempPitch = tempPitch + cell2mat(nonNoteSyms(<span class="keyword">...</span>
+                            accidentalIdx,5));
+                    <span class="keyword">end</span>
+                    <span class="comment">% Pitch/note buffers will be modified based on changes</span>
+                    <span class="comment">% made by accidentals</span>
+                    measurePitch(tempIdx) = tempPitch;
+                    tempNote = string(pitchTranslator(tempPitch));
+                    measureNote(tempIdx) = tempNote;
+                <span class="keyword">end</span>
+                <span class="comment">%------------------------------------------------------</span>
+                <span class="comment">% Accent dot locator and beat re-assignment</span>
+                <span class="comment">% - These are dots that are located on the right-hand</span>
+                <span class="comment">%   side of notes/rests</span>
+                <span class="comment">% - If found, increases the beat value by a factor of</span>
+                <span class="comment">%   1.5</span>
+                <span class="comment">%------------------------------------------------------</span>
+                <span class="comment">% First pass: Checks for symbols meeting the location</span>
+                <span class="comment">%     requirements</span>
+                accentDotIdx = find((<span class="keyword">...</span>
+                    abs(cent_x(nonNoteIdx) - cent_x(j)) &lt;= 2.5*spaceHeight) &amp; <span class="keyword">...</span>
+                    (cent_y(j) - cent_y(nonNoteIdx) &lt;= 0.75*spaceHeight) &amp; <span class="keyword">...</span>
+                    (cent_y(j) - cent_y(nonNoteIdx) &gt;= -0.25*spaceHeight) &amp; <span class="keyword">...</span>
+                    (cent_x(nonNoteIdx) &gt; cent_x(j)));
+                <span class="comment">% Second pass: Checks if the located symbol is a dot</span>
+                accentDotIdx = find(strcmp(string(nonNoteSyms(accentDotIdx,3)),<span class="keyword">...</span>
+                    <span class="string">"dot"</span>));
+                <span class="comment">% If accent dot exists, increase current note/rest's</span>
+                <span class="comment">% beat value by 1.5</span>
+                <span class="keyword">if</span> (~isempty(accentDotIdx))
+                    tempBeat = tempBeat * 1.5;
+                <span class="keyword">end</span>
+
+
+                <span class="comment">%------------------------------------------------------</span>
+                <span class="comment">% Vertical symbol locator:</span>
+                <span class="comment">% - Compared to the solo sheets, only other notes and</span>
+                <span class="comment">%   rests are considered as vertical symbols</span>
+                <span class="comment">%------------------------------------------------------</span>
+                verticalSyms = find((cent_y(totalSymsIdx) ~= cent_y(j)) &amp; <span class="keyword">...</span>
+                    (abs(cent_x(j) - cent_x(totalSymsIdx)) &lt;= 2*spaceHeight));
+                chordNoteIdx = verticalSyms(strcmp(string(totalSyms(<span class="keyword">...</span>
+                    verticalSyms,3)), <span class="string">"note"</span>) | strcmp(string(totalSyms(<span class="keyword">...</span>
+                    verticalSyms,3)), <span class="string">"rest"</span>));
+                <span class="comment">% If the vertical note/chord has been already visited,</span>
+                <span class="comment">% the index is cleared</span>
+                chordNoteIdx(ismember(chordNoteIdx, visited)) = [];
+
+                <span class="comment">%------------------------------------------------------</span>
+                <span class="comment">% Tie/slur locator and 'note break' assignment</span>
+                <span class="comment">% - Note break is a parameter which determines if</span>
+                <span class="comment">%   a note/s should be played without breaks</span>
+                <span class="comment">%------------------------------------------------------</span>
+                <span class="comment">% First pass: checks for left or right edges which are</span>
+                <span class="comment">%     found above or below a note</span>
+                tieSlurStart = find(abs(w1(nonNoteIdx) - cent_x(j)) &lt; <span class="keyword">...</span>
+                    0.5*spaceHeight);
+                tieSlurEnd = find(abs(w2(nonNoteIdx) - cent_x(j)) &lt; <span class="keyword">...</span>
+                    0.5*spaceHeight);
+                <span class="comment">% Second pass: check if symbol type is a tie or a slur</span>
+                tieSlurStartIdx = find(strcmp(string(nonNoteSyms(<span class="keyword">...</span>
+                    tieSlurStart,4)), <span class="string">"tie"</span>) | strcmp(string(totalSyms(<span class="keyword">...</span>
+                    tieSlurStart,4)), <span class="string">"slur"</span>));
+                tieSlurEndIdx = isempty(find(strcmp(string(nonNoteSyms(<span class="keyword">...</span>
+                    tieSlurEnd,4)), <span class="string">"tie"</span>) | strcmp(string(totalSyms(<span class="keyword">...</span>
+                    tieSlurEnd,4)), <span class="string">"slur"</span>),1));
+
+                <span class="comment">% If it exists, process each note/rest similar to current</span>
+                <span class="comment">% symbol</span>
+                <span class="keyword">if</span> (~isempty(chordNoteIdx))
+                    <span class="comment">% Add previous note to total notes array</span>
+                    totalNotes = [totalNotes; tempNote];
+                    totalBeat = [totalBeat; tempBeat];
+
+                    <span class="keyword">for</span> jj = 1:length(chordNoteIdx)
+                        <span class="comment">% Add current note to visited array</span>
+                        visited = [visited; chordNoteIdx(jj)];
+                        <span class="comment">% Type check (note/rest)</span>
+                        isNote2 = strcmp(string(totalSyms(chordNoteIdx(<span class="keyword">...</span>
+                            jj),3)),<span class="string">'note'</span>);
+                        isRest2 = strcmp(string(totalSyms(chordNoteIdx(<span class="keyword">...</span>
+                            jj),3)),<span class="string">'rest'</span>);
+                        <span class="comment">% Calculate location of staff/ledger/space closest to</span>
+                        <span class="comment">% symbol centroid</span>
+                        [~, idx] = min(abs(ledgerStaffSpace - cent_y(<span class="keyword">...</span>
+                            chordNoteIdx(jj))));
+                        <span class="comment">% If symbol is note, buffered pitch/note and beat</span>
+                        <span class="comment">% values are used</span>
+                        <span class="keyword">if</span> (isNote2)
+                            tempPitch = measurePitch(idx);
+                            tempNote = measureNote(idx);
+                            tempBeat = cell2mat(totalSyms(chordNoteIdx(<span class="keyword">...</span>
+                                jj),5));
+                        <span class="comment">% For the case of rest, pitch is set to 0, and</span>
+                        <span class="comment">% beat is set to default</span>
+                        <span class="keyword">elseif</span> (isRest2)
+                            tempPitch = 0;
+                            tempNote = string(pitchTranslator(tempPitch));
+                            tempBeat = cell2mat(totalSyms(chordNoteIdx(<span class="keyword">...</span>
+                                jj),5));
+                        <span class="keyword">end</span>
+
+                        <span class="comment">% Accidental locator</span>
+                        accidentalIdx = find((<span class="keyword">...</span>
+                            abs(cent_x(nonNoteIdx) - cent_x(chordNoteIdx(<span class="keyword">...</span>
+                                jj))) &lt; 5*spaceHeight) &amp; <span class="keyword">...</span>
+                            (abs(cent_y(nonNoteIdx) - cent_y(chordNoteIdx(<span class="keyword">...</span>
+                                jj))) &lt; 7*lineHeight) &amp; <span class="keyword">...</span>
+                            (cent_x(nonNoteIdx) &lt; cent_x(chordNoteIdx(jj))));
+                        accidentalIdx = accidentalIdx(find(strcmp(string(<span class="keyword">...</span>
+                            nonNoteSyms(accidentalIdx,3)), <span class="string">"accidental"</span>)));
+                        <span class="keyword">if</span> (~isempty(accidentalIdx))
+                            [~, tempIdx] = min(abs(ledgerStaffSpace - <span class="keyword">...</span>
+                                cent_y(nonNoteIdx(accidentalIdx))));
+                            <span class="keyword">if</span> (strcmp(string(nonNoteSyms(accidentalIdx,<span class="keyword">...</span>
+                                    4)), <span class="string">"natural"</span>))
+                                <span class="keyword">if</span> ((ismember(tempIdx, keySigIdx) &amp;&amp; <span class="keyword">...</span>
+                                    strcmp(keyType, <span class="string">"sharp"</span>)) || <span class="keyword">...</span>
+                                    (measurePitch(tempIdx) &gt; pitchPreKS(<span class="keyword">...</span>
+                                    tempIdx)))
+                                    tempPitch = tempPitch - 1;
+                                <span class="keyword">elseif</span> ((ismember(tempIdx, keySigIdx) &amp;&amp; <span class="keyword">...</span>
+                                    strcmp(keyType, <span class="string">"flat"</span>)) || <span class="keyword">...</span>
+                                    (measurePitch(tempIdx) &lt; pitchPreKS(<span class="keyword">...</span>
+                                    tempIdx)))
+                                    tempPitch = tempPitch + 1;
+                                <span class="keyword">end</span>
+                            <span class="keyword">else</span>
+                                tempPitch = tempPitch + cell2mat(<span class="keyword">...</span>
+                                    nonNoteSyms(accidentalIdx,5));
+                            <span class="keyword">end</span>
+                            measurePitch(tempIdx) = tempPitch;
+                            tempNote = string(pitchTranslator(tempPitch));
+                            measureNote(tempIdx) = tempNote;
+                        <span class="keyword">end</span>
+                        <span class="comment">% Accent dot locator</span>
+                        accentDotIdx = find((<span class="keyword">...</span>
+                            abs(cent_x(nonNoteIdx) - cent_x(chordNoteIdx(<span class="keyword">...</span>
+                                jj))) &lt;= 2.5*spaceHeight) &amp; <span class="keyword">...</span>
+                            (cent_y(chordNoteIdx(jj)) - cent_y(nonNoteIdx)<span class="keyword">...</span>
+                                &lt;= 0.75*spaceHeight) &amp; <span class="keyword">...</span>
+                            (cent_y(chordNoteIdx(jj)) - cent_y(nonNoteIdx)<span class="keyword">...</span>
+                                &gt;= -0.5*spaceHeight) &amp; <span class="keyword">...</span>
+                            (cent_x(nonNoteIdx) &gt; cent_x(chordNoteIdx(jj))));
+                        accentDotIdx = find(strcmp(string(nonNoteSyms(<span class="keyword">...</span>
+                            accentDotIdx,3)), <span class="string">"dot"</span>));
+                        <span class="comment">% If accent dot exists, increase current beat by</span>
+                        <span class="comment">% a factor of 1.5</span>
+                        <span class="keyword">if</span> (~isempty(accentDotIdx))
+                            tempBeat = tempBeat * 1.5;
+                        <span class="keyword">end</span>
+
+                        <span class="comment">% Add current note/beat values in note and beat</span>
+                        <span class="comment">% arrays</span>
+                        totalNotes = [totalNotes; tempNote];
+                        totalBeat = [totalBeat; tempBeat];
+                    <span class="keyword">end</span>
+                    <span class="comment">% If total beat values are the same, there is no</span>
+                    <span class="comment">% need for further processing</span>
+                    <span class="keyword">if</span> (numel(unique(totalBeat)) == 1)
+                        <span class="comment">% Write beat value to file</span>
+                        fprintf(fid2,<span class="string">'%.3f, '</span>, min(totalBeat));
+                        <span class="comment">% Copy total notes in buffer</span>
+                        noteBuf(1:length(totalBeat)) = totalNotes;
+
+                        <span class="comment">% If a tie/slur starting edge is detected, note</span>
+                        <span class="comment">% break is set to 0</span>
+                        <span class="keyword">if</span> (~isempty(tieSlurStartIdx))
+                            tiePresent = [tiePresent; tieSlurStartIdx];
+                            noteBreak = 0;
+                        <span class="comment">% If end edge is detected, add a note break</span>
+                        <span class="comment">% (set to 1)</span>
+                        <span class="keyword">elseif</span>(~isempty(tieSlurEndIdx) &amp;&amp; ~isempty(<span class="keyword">...</span>
+                                tiePresent))
+                            tiePresent = [];
+                            noteBreak = 1;
+                        <span class="comment">% If note is in between tie edges, note break is</span>
+                        <span class="comment">% also set to 0</span>
+                        <span class="keyword">elseif</span> (~isempty(tiePresent) &amp;&amp; (cent_x(j) &gt; <span class="keyword">...</span>
+                                tiePresent(1)))
+                            noteBreak = 0;
+                        <span class="comment">% If above conditions are not met, set note</span>
+                        <span class="comment">% break to 1</span>
+                        <span class="keyword">else</span>
+                            noteBreak = 1;
+                        <span class="keyword">end</span>
+
+                        <span class="comment">% Clear total notes and total beats, and write</span>
+                        <span class="comment">% current notes and note break value to file</span>
+                        totalNotes = [];
+                        totalBeat = [];
+                        fprintf(fid1,<span class="string">'\t{%s, %s, %s, %s, %s, %s, %s, %s, %d},\n'</span>, <span class="keyword">...</span>
+                            noteBuf, noteBreak);
+                    <span class="keyword">else</span>
+                        <span class="comment">% If multiple beats are present, the minimum value</span>
+                        <span class="comment">% will be taken as current beat</span>
+                        [offset, ~] = min(totalBeat);
+                        minIdx = find(totalBeat == min(totalBeat));
+                        fprintf(fid2,<span class="string">'%.3f, '</span>, min(totalBeat));
+                        <span class="comment">% Once the value is written to file, the rest of</span>
+                        <span class="comment">% the beat values will be decreased by the value of</span>
+                        <span class="comment">% of the minimum beat (offset)</span>
+                        <span class="keyword">for</span> ii = 1:length(totalBeat)
+                            <span class="keyword">if</span> (ii ~= minIdx)
+                                totalBeat(ii) = totalBeat(ii) - offset;
+                            <span class="keyword">end</span>
+                        <span class="keyword">end</span>
+                        <span class="comment">% Copy total notes to buffer and write to file</span>
+                        noteBuf(1:length(totalBeat)) = totalNotes;
+                        fprintf(fid1,<span class="string">'\t{%s, %s, %s, %s, %s, %s, %s, %s, 0},\n'</span>, <span class="keyword">...</span>
+                            noteBuf);
+                        <span class="comment">% Remove minimum beat, note from total note/beat</span>
+                        <span class="comment">% arrays</span>
+                        totalNotes(minIdx) = [];
+                        totalBeat(minIdx) = [];
+                    <span class="keyword">end</span>
+                <span class="keyword">else</span>
+                    <span class="comment">% Add current note/beat values in note and beat</span>
+                    <span class="comment">% arrays</span>
+                    totalNotes = [totalNotes; tempNote];
+                    totalBeat = [totalBeat; tempBeat];
+                    <span class="comment">% If total beat values are the same, there is no</span>
+                    <span class="comment">% need for further processing</span>
+                    <span class="keyword">if</span> (numel(unique(totalBeat)) == 1)
+                        <span class="comment">% If a tie/slur starting edge is detected, note</span>
+                        <span class="comment">% break is set to 0</span>
+                        <span class="keyword">if</span> (~isempty(tieSlurStartIdx))
+                            tiePresent = [tiePresent; tieSlurStartIdx];
+                            noteBreak = 0;
+                        <span class="comment">% If end edge is detected, add a note break</span>
+                        <span class="comment">% (set to 1)</span>
+                        <span class="keyword">elseif</span>(~isempty(tieSlurEndIdx) &amp;&amp; ~isempty(<span class="keyword">...</span>
+                                tiePresent))
+                            tiePresent = [];
+                            noteBreak = 1;
+                        <span class="comment">% If note is in between tie edges, note break is</span>
+                        <span class="comment">% also set to 0</span>
+                        <span class="keyword">elseif</span> (~isempty(tiePresent) &amp;&amp; (cent_x(j) &gt; <span class="keyword">...</span>
+                                tiePresent(1)))
+                            noteBreak = 0;
+                        <span class="comment">% If above conditions are not met, set note</span>
+                        <span class="comment">% break to 1</span>
+                        <span class="keyword">else</span>
+                            noteBreak = 1;
+                        <span class="keyword">end</span>
+
+                        <span class="comment">% Write beat value to file</span>
+                        fprintf(fid2,<span class="string">'%.3f, '</span>, min(totalBeat));
+                        <span class="comment">% Copy total notes in buffer</span>
+                        noteBuf(1:length(totalBeat)) = totalNotes;
+                        <span class="comment">% Clear total notes and total beats, and write</span>
+                        <span class="comment">% current notes and note break value to file</span>
+                        fprintf(fid1,<span class="string">'\t{%s, %s, %s, %s, %s, %s, %s, %s, %d},\n'</span>, <span class="keyword">...</span>
+                            noteBuf, noteBreak);
+                        totalNotes = [];
+                        totalBeat = [];
+                    <span class="keyword">else</span>
+                        <span class="comment">% If multiple beats are present, the minimum value</span>
+                        <span class="comment">% will be taken as current beat</span>
+                        [offset, ~] = min(totalBeat);
+                        minIdx = find(totalBeat == min(totalBeat));
+                        fprintf(fid2,<span class="string">'%.3f, '</span>, min(totalBeat));
+                        <span class="comment">% Once the value is written to file, the rest of</span>
+                        <span class="comment">% the beat values will be decreased by the value of</span>
+                        <span class="comment">% of the minimum beat (offset)</span>
+                        <span class="keyword">for</span> ii = 1:length(totalBeat)
+                            <span class="keyword">if</span> (ii ~= minIdx)
+                                totalBeat(ii) = totalBeat(ii) - offset;
+                            <span class="keyword">end</span>
+                        <span class="keyword">end</span>
+                        <span class="comment">% Copy total notes to buffer and write to file</span>
+                        noteBuf(1:length(totalBeat)) = totalNotes;
+                        fprintf(fid1,<span class="string">'\t{%s, %s, %s, %s, %s, %s, %s, %s, 0},\n'</span>, <span class="keyword">...</span>
+                            noteBuf);
+                        <span class="comment">% Remove minimum beat, note from total note/beat</span>
+                        <span class="comment">% arrays</span>
+                        totalNotes(minIdx) = [];
+                        totalBeat(minIdx) = [];
+                    <span class="keyword">end</span>
+                <span class="keyword">end</span>
+            <span class="comment">%---------------------------------------------</span>
+            <span class="comment">% Barline symbol check</span>
+            <span class="comment">%---------------------------------------------</span>
+            <span class="keyword">elseif</span>(isBar)
+                <span class="comment">% If barline is found, reset the pitch and note buffers</span>
+                measurePitch = pitch;
+                measureNote = note;
+                <span class="comment">% Add new lines to both note and beat input files</span>
+                fprintf(fid1, <span class="string">'\n'</span>);
+                fprintf(fid2, <span class="string">'\n\t'</span>);
+            <span class="keyword">end</span>
+        <span class="keyword">end</span>
+    <span class="keyword">end</span>
+<span class="keyword">end</span>
+</pre><pre class="codeoutput error">Not enough input arguments.
+
+Error in PianoSheetMusicGenerator (line 15)
+    totalSymsIdx = 1:length(totalSyms);
+</pre><p class="footer"><br><a href="https://www.mathworks.com/products/matlab/">Published with MATLAB&reg; R2020b</a><br></p></div><!--
+##### SOURCE BEGIN #####
+%REPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASH-
+% Function name:    PianoSheetMusicGenerator
+% Input arg(s):     ledger/staff/space locations, pre/post-key pitches and
+%                   notes, total symbol list, space/line heights, time and 
+%                   key signature array, note/beat file IDs
+% Description:      Produces a note and beat array based on the recon-
+%                   struction of the musical symbols on a piano section
+%REPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASH-
+function PianoSheetMusicGenerator(totalSyms, totalTimeSignature, ...
+    ledgerStaffSpace, pitch, note, pitchPreKS, staffCenters, keyType, ...
+    keySigIdx, spaceHeight, lineHeight, fid1, fid2)
+
+
+    % Generate reference indices for subsequent symbol locations
+    totalSymsIdx = 1:length(totalSyms);
+    symbolLocs = cell2mat(totalSyms(:,2));
+    symbolCat = string(totalSyms(:,3));
+    % Get indices of note/rest/barline symbols
+    noteRestBarIdx = find(strcmp(symbolCat,"note") | ...
+        strcmp(symbolCat,"rest") | ...
+        strcmp(symbolCat,"barline"));
+    noteRestBars = totalSyms(noteRestBarIdx,:);
+    % Get indices of symbols that are not note/rest/barline
+    nonNoteIdx = totalSymsIdx(~ismember(totalSymsIdx, noteRestBarIdx));
+    nonNoteSyms = totalSyms(nonNoteIdx,:);
+    
+    % Calculate reference centroids    
+    h1 = symbolLocs(:,1);
+    h2 = symbolLocs(:,2);
+    w1 = symbolLocs(:,3);
+    w2 = symbolLocs(:,4);
+    cent_x = (w1+w2)./2;
+    cent_y = (h1+h2)./2;
+
+    %REPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASH
+    % Preprocessing: single whole rest in a measure is removed from
+    % note/rest assignment; if two whole rests in one measure, keep the
+    % first one and remove the second one
+    %REPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASH
+    wholeCount = 0;
+    wholeArr = [];
+    visited = [];
+    for ii = 1:length(noteRestBarIdx)
+        if (strcmp(cell2mat(noteRestBars(ii,4)),'wholehalf'))
+            [~, wholeHalfIdx] = min(abs(staffCenters - cent_y(...
+                noteRestBarIdx(ii))));
+            if (wholeHalfIdx == 2 || wholeHalfIdx == 7)
+                if (isempty(totalTimeSignature))
+                    totalSyms(noteRestBarIdx(ii),5) = {1};
+                else                        
+                    temp = strsplit(string(totalTimeSignature(1,4)),'/');
+                    temp2 = str2double(temp(1))/str2double(temp(2));
+                    totalSyms(noteRestBarIdx(ii),5) = {temp2};
+                end
+                wholeCount = wholeCount + 1;
+                wholeArr = [wholeArr; noteRestBarIdx(ii)];
+            elseif (wholeHalfIdx == 3 || wholeHalfIdx == 8)
+                totalSyms(noteRestBarIdx(ii),5) = {0.5};
+            end
+        elseif (strcmp(cell2mat(noteRestBars(ii,3)),'barline'))
+            if (wholeCount == 1)
+                visited = [visited; wholeArr(1)];
+            elseif (wholeCount == 2)
+                visited = [visited; wholeArr(2)];
+            end
+            wholeCount = 0;
+            wholeArr = [];
+        end
+    end
+
+    % Modifiable buffers for pitch and note
+    measurePitch = pitch;
+    measureNote = note;
+
+    % Array initializers
+    tiePresent = [];
+    totalNotes = [];
+    totalBeat = [];
+
+    % Process individual symbol detected by phase 2
+    for j = 1:size(totalSyms, 1)
+        % Performs a type check if the symbol is either a note, rest, 
+        % or barline        
+        isNote = strcmp(cell2mat(totalSyms(j,3)),'note');
+        isRest = strcmp(cell2mat(totalSyms(j,3)),'rest');
+        isBar = strcmp(cell2mat(totalSyms(j,3)),'barline');
+
+        % If current symbol has already been processed, skip processing    
+        if(ismember(j, sort(visited)))
+            continue;
+        else
+            % In the case of piano sheets, a maximum of eight notes can 
+            % be played simultaneously
+            noteBuf = string(zeros(1,8));
+            % Add current symbol index to visited array
+            visited = [visited; j];
+            if (isNote || isRest)
+                % Calculate location of staff/ledger/space closest to
+                % symbol centroid
+                [~, idx] = min(abs(ledgerStaffSpace - cent_y(j)));
+                if (isNote)
+                    % If symbol is a note, temporary pitch/note is based 
+                    % on buffer values, while beat is based on default 
+                    tempPitch = measurePitch(idx);
+                    tempNote = measureNote(idx);
+                elseif (isRest)
+                    % If symbol is a rest, pitch is set to 0,
+                    tempPitch = 0;
+                    tempNote = string(pitchTranslator(tempPitch));
+                end
+                % Set beat to default/assigned value
+                tempBeat = cell2mat(totalSyms(j,5));
+
+
+                %REPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASH
+                % Accidental locator and pitch re-assignment
+                % - Accidentals are typically located on the left-hand 
+                %   side of notes
+                % - Modifies the note's pitch based on conditions
+                %REPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASH
+                % Find possible accidental on the note's LHS
+                accidentalIdx = find((...
+                    abs(cent_x(nonNoteIdx) - cent_x(j)) < 5*spaceHeight) & ...
+                    (abs(cent_y(nonNoteIdx) - cent_y(j)) < 7*lineHeight) & ...
+                    (cent_x(nonNoteIdx) < cent_x(j)));
+                % Ensures that the located symbol is indeed an 
+                % accidental
+                accidentalIdx = accidentalIdx(find(strcmp(string(...
+                    nonNoteSyms(accidentalIdx,3)), "accidental")));
+                if (~isempty(accidentalIdx))
+                    % Returns the index of the staff/space/ledger 
+                    % centroid closest to the accidental
+                    [~, tempIdx] = min(abs(ledgerStaffSpace - cent_y(...
+                        nonNoteIdx(accidentalIdx))));
+                    % Natural accidental case: its value depends on current
+                    % line pitch 
+                    if (strcmp(string(nonNoteSyms(accidentalIdx, 4)),...
+                            "natural"))
+                        % if natural is found in a line with a sharp key,
+                        % or buffered pitch is higher than original pitch, 
+                        % current pitch will be decreased by 1
+                        if ((ismember(tempIdx, keySigIdx) && strcmp(...
+                            keyType, "sharp")) || (measurePitch(...
+                            tempIdx) > pitchPreKS(tempIdx)))
+                            tempPitch = tempPitch - 1;
+                        % if natural is found in a line with a flat key,
+                        % or buffered pitch is lower than original pitch, 
+                        % current pitch will be increased by 1
+                        elseif ((ismember(tempIdx, keySigIdx) && strcmp(...
+                            keyType, "flat")) || (measurePitch(...
+                            tempIdx) < pitchPreKS(tempIdx)))
+                            tempPitch = tempPitch + 1;
+                        end
+                    % For flat/sharp, use default value
+                    else
+                        tempPitch = tempPitch + cell2mat(nonNoteSyms(...
+                            accidentalIdx,5));
+                    end
+                    % Pitch/note buffers will be modified based on changes
+                    % made by accidentals
+                    measurePitch(tempIdx) = tempPitch;
+                    tempNote = string(pitchTranslator(tempPitch));
+                    measureNote(tempIdx) = tempNote;
+                end
+                %REPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASH
+                % Accent dot locator and beat re-assignment
+                % - These are dots that are located on the right-hand
+                %   side of notes/rests 
+                % - If found, increases the beat value by a factor of 
+                %   1.5
+                %REPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASH
+                % First pass: Checks for symbols meeting the location
+                %     requirements
+                accentDotIdx = find((...
+                    abs(cent_x(nonNoteIdx) - cent_x(j)) <= 2.5*spaceHeight) & ...
+                    (cent_y(j) - cent_y(nonNoteIdx) <= 0.75*spaceHeight) & ...
+                    (cent_y(j) - cent_y(nonNoteIdx) >= -0.25*spaceHeight) & ...
+                    (cent_x(nonNoteIdx) > cent_x(j)));
+                % Second pass: Checks if the located symbol is a dot
+                accentDotIdx = find(strcmp(string(nonNoteSyms(accentDotIdx,3)),...
+                    "dot"));
+                % If accent dot exists, increase current note/rest's 
+                % beat value by 1.5
+                if (~isempty(accentDotIdx))
+                    tempBeat = tempBeat * 1.5;
+                end
+
+                
+                %REPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASH
+                % Vertical symbol locator:
+                % - Compared to the solo sheets, only other notes and 
+                %   rests are considered as vertical symbols
+                %REPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASH
+                verticalSyms = find((cent_y(totalSymsIdx) ~= cent_y(j)) & ...
+                    (abs(cent_x(j) - cent_x(totalSymsIdx)) <= 2*spaceHeight)); 
+                chordNoteIdx = verticalSyms(strcmp(string(totalSyms(...
+                    verticalSyms,3)), "note") | strcmp(string(totalSyms(...
+                    verticalSyms,3)), "rest"));
+                % If the vertical note/chord has been already visited,
+                % the index is cleared
+                chordNoteIdx(ismember(chordNoteIdx, visited)) = [];
+
+                %REPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASH
+                % Tie/slur locator and 'note break' assignment
+                % - Note break is a parameter which determines if 
+                %   a note/s should be played without breaks
+                %REPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASH
+                % First pass: checks for left or right edges which are  
+                %     found above or below a note                
+                tieSlurStart = find(abs(w1(nonNoteIdx) - cent_x(j)) < ...
+                    0.5*spaceHeight);
+                tieSlurEnd = find(abs(w2(nonNoteIdx) - cent_x(j)) < ...
+                    0.5*spaceHeight);
+                % Second pass: check if symbol type is a tie or a slur
+                tieSlurStartIdx = find(strcmp(string(nonNoteSyms(...
+                    tieSlurStart,4)), "tie") | strcmp(string(totalSyms(...
+                    tieSlurStart,4)), "slur"));
+                tieSlurEndIdx = isempty(find(strcmp(string(nonNoteSyms(...
+                    tieSlurEnd,4)), "tie") | strcmp(string(totalSyms(...
+                    tieSlurEnd,4)), "slur"),1));
+
+                % If it exists, process each note/rest similar to current
+                % symbol
+                if (~isempty(chordNoteIdx))
+                    % Add previous note to total notes array
+                    totalNotes = [totalNotes; tempNote];
+                    totalBeat = [totalBeat; tempBeat];
+                    
+                    for jj = 1:length(chordNoteIdx)
+                        % Add current note to visited array
+                        visited = [visited; chordNoteIdx(jj)];
+                        % Type check (note/rest)
+                        isNote2 = strcmp(string(totalSyms(chordNoteIdx(...
+                            jj),3)),'note');
+                        isRest2 = strcmp(string(totalSyms(chordNoteIdx(...
+                            jj),3)),'rest');
+                        % Calculate location of staff/ledger/space closest to
+                        % symbol centroid
+                        [~, idx] = min(abs(ledgerStaffSpace - cent_y(...
+                            chordNoteIdx(jj))));
+                        % If symbol is note, buffered pitch/note and beat 
+                        % values are used
+                        if (isNote2)
+                            tempPitch = measurePitch(idx);
+                            tempNote = measureNote(idx);
+                            tempBeat = cell2mat(totalSyms(chordNoteIdx(...
+                                jj),5));
+                        % For the case of rest, pitch is set to 0, and 
+                        % beat is set to default
+                        elseif (isRest2)
+                            tempPitch = 0;
+                            tempNote = string(pitchTranslator(tempPitch));
+                            tempBeat = cell2mat(totalSyms(chordNoteIdx(...
+                                jj),5));
+                        end
+                        
+                        % Accidental locator
+                        accidentalIdx = find((...
+                            abs(cent_x(nonNoteIdx) - cent_x(chordNoteIdx(...
+                                jj))) < 5*spaceHeight) & ...
+                            (abs(cent_y(nonNoteIdx) - cent_y(chordNoteIdx(...
+                                jj))) < 7*lineHeight) & ...
+                            (cent_x(nonNoteIdx) < cent_x(chordNoteIdx(jj))));
+                        accidentalIdx = accidentalIdx(find(strcmp(string(...
+                            nonNoteSyms(accidentalIdx,3)), "accidental")));
+                        if (~isempty(accidentalIdx))
+                            [~, tempIdx] = min(abs(ledgerStaffSpace - ...
+                                cent_y(nonNoteIdx(accidentalIdx))));
+                            if (strcmp(string(nonNoteSyms(accidentalIdx,...
+                                    4)), "natural"))
+                                if ((ismember(tempIdx, keySigIdx) && ...
+                                    strcmp(keyType, "sharp")) || ...
+                                    (measurePitch(tempIdx) > pitchPreKS(...
+                                    tempIdx)))
+                                    tempPitch = tempPitch - 1;
+                                elseif ((ismember(tempIdx, keySigIdx) && ...
+                                    strcmp(keyType, "flat")) || ...
+                                    (measurePitch(tempIdx) < pitchPreKS(...
+                                    tempIdx)))
+                                    tempPitch = tempPitch + 1;
+                                end
+                            else
+                                tempPitch = tempPitch + cell2mat(...
+                                    nonNoteSyms(accidentalIdx,5));
+                            end
+                            measurePitch(tempIdx) = tempPitch;
+                            tempNote = string(pitchTranslator(tempPitch));
+                            measureNote(tempIdx) = tempNote;
+                        end
+                        % Accent dot locator
+                        accentDotIdx = find((...
+                            abs(cent_x(nonNoteIdx) - cent_x(chordNoteIdx(...
+                                jj))) <= 2.5*spaceHeight) & ...
+                            (cent_y(chordNoteIdx(jj)) - cent_y(nonNoteIdx)...
+                                <= 0.75*spaceHeight) & ...
+                            (cent_y(chordNoteIdx(jj)) - cent_y(nonNoteIdx)...
+                                >= -0.5*spaceHeight) & ...
+                            (cent_x(nonNoteIdx) > cent_x(chordNoteIdx(jj))));
+                        accentDotIdx = find(strcmp(string(nonNoteSyms(...
+                            accentDotIdx,3)), "dot"));
+                        % If accent dot exists, increase current beat by 
+                        % a factor of 1.5
+                        if (~isempty(accentDotIdx))
+                            tempBeat = tempBeat * 1.5;
+                        end
+                        
+                        % Add current note/beat values in note and beat
+                        % arrays
+                        totalNotes = [totalNotes; tempNote];
+                        totalBeat = [totalBeat; tempBeat];
+                    end
+                    % If total beat values are the same, there is no
+                    % need for further processing
+                    if (numel(unique(totalBeat)) == 1)                            
+                        % Write beat value to file
+                        fprintf(fid2,'%.3f, ', min(totalBeat));                        
+                        % Copy total notes in buffer
+                        noteBuf(1:length(totalBeat)) = totalNotes;
+                        
+                        % If a tie/slur starting edge is detected, note 
+                        % break is set to 0
+                        if (~isempty(tieSlurStartIdx))
+                            tiePresent = [tiePresent; tieSlurStartIdx];
+                            noteBreak = 0;
+                        % If end edge is detected, add a note break 
+                        % (set to 1)
+                        elseif(~isempty(tieSlurEndIdx) && ~isempty(...
+                                tiePresent))
+                            tiePresent = [];
+                            noteBreak = 1;
+                        % If note is in between tie edges, note break is 
+                        % also set to 0
+                        elseif (~isempty(tiePresent) && (cent_x(j) > ...
+                                tiePresent(1)))
+                            noteBreak = 0;
+                        % If above conditions are not met, set note 
+                        % break to 1
+                        else
+                            noteBreak = 1;
+                        end
+                        
+                        % Clear total notes and total beats, and write
+                        % current notes and note break value to file
+                        totalNotes = [];
+                        totalBeat = [];
+                        fprintf(fid1,'\t{%s, %s, %s, %s, %s, %s, %s, %s, %d},\n', ...
+                            noteBuf, noteBreak);
+                    else
+                        % If multiple beats are present, the minimum value
+                        % will be taken as current beat
+                        [offset, ~] = min(totalBeat);
+                        minIdx = find(totalBeat == min(totalBeat));
+                        fprintf(fid2,'%.3f, ', min(totalBeat));
+                        % Once the value is written to file, the rest of
+                        % the beat values will be decreased by the value of
+                        % of the minimum beat (offset)
+                        for ii = 1:length(totalBeat)
+                            if (ii ~= minIdx)
+                                totalBeat(ii) = totalBeat(ii) - offset;
+                            end
+                        end
+                        % Copy total notes to buffer and write to file
+                        noteBuf(1:length(totalBeat)) = totalNotes;
+                        fprintf(fid1,'\t{%s, %s, %s, %s, %s, %s, %s, %s, 0},\n', ...
+                            noteBuf);
+                        % Remove minimum beat, note from total note/beat
+                        % arrays
+                        totalNotes(minIdx) = [];
+                        totalBeat(minIdx) = [];
+                    end
+                else
+                    % Add current note/beat values in note and beat
+                    % arrays
+                    totalNotes = [totalNotes; tempNote];
+                    totalBeat = [totalBeat; tempBeat];
+                    % If total beat values are the same, there is no
+                    % need for further processing                   
+                    if (numel(unique(totalBeat)) == 1)                        
+                        % If a tie/slur starting edge is detected, note 
+                        % break is set to 0
+                        if (~isempty(tieSlurStartIdx))
+                            tiePresent = [tiePresent; tieSlurStartIdx];
+                            noteBreak = 0;
+                        % If end edge is detected, add a note break 
+                        % (set to 1)
+                        elseif(~isempty(tieSlurEndIdx) && ~isempty(...
+                                tiePresent))
+                            tiePresent = [];
+                            noteBreak = 1;
+                        % If note is in between tie edges, note break is 
+                        % also set to 0
+                        elseif (~isempty(tiePresent) && (cent_x(j) > ...
+                                tiePresent(1)))
+                            noteBreak = 0;
+                        % If above conditions are not met, set note 
+                        % break to 1
+                        else
+                            noteBreak = 1;
+                        end
+                        
+                        % Write beat value to file
+                        fprintf(fid2,'%.3f, ', min(totalBeat));
+                        % Copy total notes in buffer
+                        noteBuf(1:length(totalBeat)) = totalNotes;
+                        % Clear total notes and total beats, and write
+                        % current notes and note break value to file                        
+                        fprintf(fid1,'\t{%s, %s, %s, %s, %s, %s, %s, %s, %d},\n', ...
+                            noteBuf, noteBreak);
+                        totalNotes = [];
+                        totalBeat = [];
+                    else
+                        % If multiple beats are present, the minimum value
+                        % will be taken as current beat
+                        [offset, ~] = min(totalBeat);
+                        minIdx = find(totalBeat == min(totalBeat));
+                        fprintf(fid2,'%.3f, ', min(totalBeat));                        
+                        % Once the value is written to file, the rest of
+                        % the beat values will be decreased by the value of
+                        % of the minimum beat (offset)
+                        for ii = 1:length(totalBeat)
+                            if (ii ~= minIdx)
+                                totalBeat(ii) = totalBeat(ii) - offset;
+                            end
+                        end
+                        % Copy total notes to buffer and write to file
+                        noteBuf(1:length(totalBeat)) = totalNotes;
+                        fprintf(fid1,'\t{%s, %s, %s, %s, %s, %s, %s, %s, 0},\n', ...
+                            noteBuf);
+                        % Remove minimum beat, note from total note/beat
+                        % arrays
+                        totalNotes(minIdx) = [];
+                        totalBeat(minIdx) = [];
+                    end
+                end
+            %REPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASH-
+            % Barline symbol check
+            %REPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASH-
+            elseif(isBar)
+                % If barline is found, reset the pitch and note buffers
+                measurePitch = pitch;
+                measureNote = note;
+                % Add new lines to both note and beat input files
+                fprintf(fid1, '\n');
+                fprintf(fid2, '\n\t');
+            end
+        end
+    end
+end
+##### SOURCE END #####
+--></body></html>

@@ -1,0 +1,419 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>detectKeySig</title><meta name="generator" content="MATLAB 9.9"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2021-04-02"><meta name="DC.source" content="detectKeySig.m"><style type="text/css">
+html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}:focus{outine:0}ins{text-decoration:none}del{text-decoration:line-through}table{border-collapse:collapse;border-spacing:0}
+
+html { min-height:100%; margin-bottom:1px; }
+html body { height:100%; margin:0px; font-family:Arial, Helvetica, sans-serif; font-size:10px; color:#000; line-height:140%; background:#fff none; overflow-y:scroll; }
+html body td { vertical-align:top; text-align:left; }
+
+h1 { padding:0px; margin:0px 0px 25px; font-family:Arial, Helvetica, sans-serif; font-size:1.5em; color:#d55000; line-height:100%; font-weight:normal; }
+h2 { padding:0px; margin:0px 0px 8px; font-family:Arial, Helvetica, sans-serif; font-size:1.2em; color:#000; font-weight:bold; line-height:140%; border-bottom:1px solid #d6d4d4; display:block; }
+h3 { padding:0px; margin:0px 0px 5px; font-family:Arial, Helvetica, sans-serif; font-size:1.1em; color:#000; font-weight:bold; line-height:140%; }
+
+a { color:#005fce; text-decoration:none; }
+a:hover { color:#005fce; text-decoration:underline; }
+a:visited { color:#004aa0; text-decoration:none; }
+
+p { padding:0px; margin:0px 0px 20px; }
+img { padding:0px; margin:0px 0px 20px; border:none; }
+p img, pre img, tt img, li img, h1 img, h2 img { margin-bottom:0px; }
+
+ul { padding:0px; margin:0px 0px 20px 23px; list-style:square; }
+ul li { padding:0px; margin:0px 0px 7px 0px; }
+ul li ul { padding:5px 0px 0px; margin:0px 0px 7px 23px; }
+ul li ol li { list-style:decimal; }
+ol { padding:0px; margin:0px 0px 20px 0px; list-style:decimal; }
+ol li { padding:0px; margin:0px 0px 7px 23px; list-style-type:decimal; }
+ol li ol { padding:5px 0px 0px; margin:0px 0px 7px 0px; }
+ol li ol li { list-style-type:lower-alpha; }
+ol li ul { padding-top:7px; }
+ol li ul li { list-style:square; }
+
+.content { font-size:1.2em; line-height:140%; padding: 20px; }
+
+pre, code { font-size:12px; }
+tt { font-size: 1.2em; }
+pre { margin:0px 0px 20px; }
+pre.codeinput { padding:10px; border:1px solid #d3d3d3; background:#f7f7f7; }
+pre.codeoutput { padding:10px 11px; margin:0px 0px 20px; color:#4c4c4c; }
+pre.error { color:red; }
+
+@media print { pre.codeinput, pre.codeoutput { word-wrap:break-word; width:100%; } }
+
+span.keyword { color:#0000FF }
+span.comment { color:#228B22 }
+span.string { color:#A020F0 }
+span.untermstring { color:#B20000 }
+span.syscmd { color:#B28C00 }
+span.typesection { color:#A0522D }
+
+.footer { width:auto; padding:10px 0px; margin:25px 0px 0px; border-top:1px dotted #878787; font-size:0.8em; line-height:140%; font-style:italic; color:#878787; text-align:left; float:none; }
+.footer p { margin:0px; }
+.footer a { color:#878787; }
+.footer a:hover { color:#878787; text-decoration:underline; }
+.footer a:visited { color:#878787; }
+
+table th { padding:7px 5px; text-align:left; vertical-align:middle; border: 1px solid #d6d4d4; font-weight:bold; }
+table td { padding:7px 5px; text-align:left; vertical-align:top; border:1px solid #d6d4d4; }
+
+
+
+
+
+  </style></head><body><div class="content"><pre class="codeinput"><span class="comment">%-------------------------------------------------------------------------</span>
+<span class="comment">% Function name:    detectKeySig</span>
+<span class="comment">% Input arg(s):     section, staffspace height, staff lines, key symbols,</span>
+<span class="comment">%                   section count, ROI boundaries</span>
+<span class="comment">% Outputs arg(s):   Key(s), key signature, next part boundary</span>
+<span class="comment">% Description:      Detects the sheet music's key signature, and returns</span>
+<span class="comment">%                   the keys for reconstruction</span>
+<span class="comment">%-------------------------------------------------------------------------</span>
+<span class="keyword">function</span> [keySig, keys, newTermBound] = detectKeySig(section, <span class="keyword">...</span>
+    spaceHeight, sectionCount, newStaffLines, initBound, termBound, <span class="keyword">...</span>
+    keySyms, debug)
+
+    <span class="comment">% Typical ROI is in between the clef(s) and time signature(s)</span>
+    tempImg = ones(size(section));
+    boundary = initBound:termBound;
+    tempImg(:,boundary) = section(:,boundary);
+
+    <span class="comment">% Close any symbols that might have been broken during staff removal</span>
+    z = imclose(~tempImg, strel(<span class="string">'line'</span>, 3, 90));
+    cc = bwconncomp(z);
+    stats = regionprops(cc, <span class="string">'BoundingBox'</span>);
+
+    symbol = {};
+    loc = {};
+    category = {};
+    type = {};
+    value = {};
+    symIdx = {};
+    edge = [];
+    leftBounds = [];
+    symCount = 1;
+
+
+    <span class="keyword">for</span> j = 1:numel(stats)
+        <span class="comment">% Extract component boundaries</span>
+        z = stats(j).BoundingBox;
+        h = ceil(z(2))+z(4);
+        w = ceil(z(1))+z(3);
+        boxHeight = ceil(z(2)):h;
+        boxWidth = ceil(z(1)):w;
+
+        <span class="comment">% Checks for potential flats or sharps present based on height and</span>
+        <span class="comment">% width</span>
+        <span class="keyword">if</span> ((z(3) &gt;= 0.75*spaceHeight &amp;&amp; z(3) &lt;= 2.25*spaceHeight) &amp;&amp; <span class="keyword">...</span>
+            (z(4) &gt;= 2*spaceHeight &amp;&amp; z(4) &lt;= 3.75*spaceHeight))
+            <span class="comment">% Each potential key is isolated and copied in a temporary</span>
+            <span class="comment">% image holder</span>
+            tempImg = ismember(labelmatrix(cc),j);
+            symTmp = ~tempImg(boxHeight, boxWidth);
+            <span class="comment">% 2-D correlation template matching with key signature dataset</span>
+            corr_val = [];
+            <span class="keyword">for</span> jj = 1:length(keySyms)
+                keyTmp = imresize(keySyms{jj},[length(boxHeight), <span class="keyword">...</span>
+                    length(boxWidth)]); <span class="comment">%z(3)+1]);</span>
+                corr_val = [corr_val corr2(symTmp, keyTmp)];
+            <span class="keyword">end</span>
+            <span class="comment">% If the maximum correlation coefficient is &gt;= 0.5, key</span>
+            <span class="comment">% parameters are saved</span>
+            [corrPct, idx] = max(corr_val);
+            <span class="keyword">if</span> (corrPct &gt;= 0.5)
+                <span class="comment">% Every right-hand edge of the detected key is saved</span>
+                edgeW = w;
+                <span class="comment">% In the case of flat symbol, the hole is extracted to be</span>
+                <span class="comment">% used in phase 3</span>
+                <span class="keyword">if</span> (strcmp(cell2mat(keySyms(idx,3)), <span class="string">'flat'</span>))
+                    flatImg = ones(size(tempImg));
+                    flatImg(boxHeight, boxWidth) = section(boxHeight, <span class="keyword">...</span>
+                        boxWidth);
+                    flatImg = ~xor(imfill(~flatImg, <span class="string">'holes'</span>), flatImg);
+                    flatStats = regionprops(flatImg, <span class="string">'BoundingBox'</span>);
+                    z = flatStats(1).BoundingBox;
+                    stats(j).BoundingBox = z;
+                    h = ceil(z(2))+z(4);
+                    w = ceil(z(1))+z(3);
+                    boxHeight = ceil(z(2)):h;
+                    boxWidth = ceil(z(1)):w;
+                    symTmp = ~flatImg(boxHeight, boxWidth);
+                <span class="keyword">end</span>
+                symbol{symCount} = symTmp;
+                loc(symCount) = {[ceil(z(2)) h ceil(z(1)) w]};
+                category(symCount) = keySyms(idx,2);
+                type(symCount) = keySyms(idx,3);
+                value(symCount) = keySyms(idx,4);
+                symIdx(symCount) = {ceil(z(1))};
+                edge(symCount) = edgeW+3;
+                symCount = symCount + 1;
+                <span class="keyword">if</span> (debug == 1)
+                    rectangle(<span class="string">'Position'</span>,stats(j).BoundingBox, <span class="keyword">...</span>
+                        <span class="string">'EdgeColor'</span>,<span class="string">'r'</span>, <span class="string">'LineWidth'</span>,2);
+                <span class="keyword">end</span>
+            <span class="keyword">end</span>
+        <span class="keyword">end</span>
+
+        <span class="comment">% Checks for time signature or notes only for boudary sections</span>
+        <span class="comment">% of subsequent sections after 1</span>
+        <span class="keyword">if</span> (sectionCount == 1)
+            <span class="keyword">if</span> ((z(3) &gt;= 1.5*spaceHeight &amp;&amp; z(3) &lt;= 3*spaceHeight) &amp;&amp; <span class="keyword">...</span>
+                (z(4) &gt;= 1.75*spaceHeight &amp;&amp; z(4) &lt;= 5.5*spaceHeight))
+                leftBounds = [leftBounds ceil(z(1))];
+            <span class="keyword">end</span>
+        <span class="keyword">end</span>
+    <span class="keyword">end</span>
+
+    <span class="comment">% Next part boundary definition based on section status</span>
+    <span class="keyword">if</span> (sectionCount == 1 &amp;&amp; ~isempty(leftBounds))
+        newTermBound = min(leftBounds)-2;
+    <span class="keyword">elseif</span> (sectionCount == 1 &amp;&amp; isempty(symbol))
+        newTermBound = initBound;
+    <span class="keyword">elseif</span> (~(isempty(symbol) || ~isempty(leftBounds)))
+        newTermBound = max(edge)-2;
+    <span class="keyword">else</span>
+        newTermBound = initBound;
+    <span class="keyword">end</span>
+
+    <span class="comment">% Combine parameters for complete key definitions</span>
+    <span class="keyword">if</span>(isempty(symbol))
+        keys = [];
+    <span class="keyword">else</span>
+        keys = [symbol', loc', category' type', value', symIdx'];
+    <span class="keyword">end</span>
+
+    <span class="comment">% Sets the number of total keys based on staff type (solo/grand)</span>
+    <span class="keyword">if</span> (length(newStaffLines) &gt;= 10 &amp;&amp; max(newStaffLines) <span class="keyword">...</span>
+        - min(newStaffLines) &gt; 5*spaceHeight)
+        totalKeys = (symCount-1)/2;
+    <span class="keyword">else</span>
+        totalKeys = symCount-1;
+    <span class="keyword">end</span>
+
+    <span class="comment">% Key signature definition based on total key count</span>
+    <span class="keyword">if</span> (totalKeys == 0)
+        keySig = <span class="string">'C/Am'</span>;
+    <span class="keyword">else</span>
+        <span class="comment">% Key signature with sharp(s)</span>
+        <span class="keyword">if</span> (strcmpi(type{1},<span class="string">'sharp'</span>))
+            <span class="keyword">if</span> (totalKeys == 1)
+                keySig = <span class="string">'G/Em'</span>;
+            <span class="keyword">elseif</span> (totalKeys == 2)
+                keySig = <span class="string">'D/Bm'</span>;
+            <span class="keyword">elseif</span> (totalKeys == 3)
+                keySig = <span class="string">'A/F#m'</span>;
+            <span class="keyword">elseif</span> (totalKeys == 4)
+                keySig = <span class="string">'E/C#m'</span>;
+            <span class="keyword">elseif</span> (totalKeys == 5)
+                keySig = <span class="string">'B/G#m'</span>;
+            <span class="keyword">elseif</span> (totalKeys == 6)
+                keySig = <span class="string">'F#/D#m'</span>;
+            <span class="keyword">elseif</span> (totalKeys == 7)
+                keySig = <span class="string">'C#/A#m'</span>;
+            <span class="keyword">end</span>
+        <span class="comment">% Key signature with flat(s)</span>
+        <span class="keyword">else</span>
+            <span class="keyword">if</span> (totalKeys == 1)
+                keySig = <span class="string">'F/Dm'</span>;
+            <span class="keyword">elseif</span> (totalKeys == 2)
+                keySig = <span class="string">'Bb/Gm'</span>;
+            <span class="keyword">elseif</span> (totalKeys == 3)
+                keySig = <span class="string">'Eb/Cm'</span>;
+            <span class="keyword">elseif</span> (totalKeys == 4)
+                keySig = <span class="string">'Ab/Fm'</span>;
+            <span class="keyword">elseif</span> (totalKeys == 5)
+                keySig = <span class="string">'Db/Bbm'</span>;
+            <span class="keyword">elseif</span> (totalKeys == 6)
+                keySig = <span class="string">'Gb/Ebm'</span>;
+            <span class="keyword">elseif</span> (totalKeys == 7)
+                keySig = <span class="string">'Cb/Abm'</span>;
+            <span class="keyword">end</span>
+        <span class="keyword">end</span>
+    <span class="keyword">end</span>
+
+<span class="keyword">end</span>
+</pre><pre class="codeoutput error">Not enough input arguments.
+
+Error in detectKeySig (line 14)
+    tempImg = ones(size(section));
+</pre><p class="footer"><br><a href="https://www.mathworks.com/products/matlab/">Published with MATLAB&reg; R2020b</a><br></p></div><!--
+##### SOURCE BEGIN #####
+%REPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASH-
+% Function name:    detectKeySig
+% Input arg(s):     section, staffspace height, staff lines, key symbols,
+%                   section count, ROI boundaries
+% Outputs arg(s):   Key(s), key signature, next part boundary
+% Description:      Detects the sheet music's key signature, and returns
+%                   the keys for reconstruction
+%REPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASH-
+function [keySig, keys, newTermBound] = detectKeySig(section, ...
+    spaceHeight, sectionCount, newStaffLines, initBound, termBound, ...
+    keySyms, debug)
+    
+    % Typical ROI is in between the clef(s) and time signature(s)
+    tempImg = ones(size(section));
+    boundary = initBound:termBound;
+    tempImg(:,boundary) = section(:,boundary);
+    
+    % Close any symbols that might have been broken during staff removal
+    z = imclose(~tempImg, strel('line', 3, 90));
+    cc = bwconncomp(z);
+    stats = regionprops(cc, 'BoundingBox');
+    
+    symbol = {};
+    loc = {};
+    category = {};
+    type = {};
+    value = {};
+    symIdx = {};
+    edge = [];
+    leftBounds = [];
+    symCount = 1;
+
+    
+    for j = 1:numel(stats)
+        % Extract component boundaries
+        z = stats(j).BoundingBox;
+        h = ceil(z(2))+z(4);
+        w = ceil(z(1))+z(3);
+        boxHeight = ceil(z(2)):h;
+        boxWidth = ceil(z(1)):w;
+
+        % Checks for potential flats or sharps present based on height and
+        % width
+        if ((z(3) >= 0.75*spaceHeight && z(3) <= 2.25*spaceHeight) && ... 
+            (z(4) >= 2*spaceHeight && z(4) <= 3.75*spaceHeight))
+            % Each potential key is isolated and copied in a temporary 
+            % image holder
+            tempImg = ismember(labelmatrix(cc),j);
+            symTmp = ~tempImg(boxHeight, boxWidth);
+            % 2-D correlation template matching with key signature dataset
+            corr_val = [];
+            for jj = 1:length(keySyms)
+                keyTmp = imresize(keySyms{jj},[length(boxHeight), ...
+                    length(boxWidth)]); %z(3)+1]);
+                corr_val = [corr_val corr2(symTmp, keyTmp)];
+            end
+            % If the maximum correlation coefficient is >= 0.5, key
+            % parameters are saved
+            [corrPct, idx] = max(corr_val);
+            if (corrPct >= 0.5)
+                % Every right-hand edge of the detected key is saved
+                edgeW = w;
+                % In the case of flat symbol, the hole is extracted to be
+                % used in phase 3
+                if (strcmp(cell2mat(keySyms(idx,3)), 'flat'))
+                    flatImg = ones(size(tempImg));
+                    flatImg(boxHeight, boxWidth) = section(boxHeight, ...
+                        boxWidth);
+                    flatImg = ~xor(imfill(~flatImg, 'holes'), flatImg);
+                    flatStats = regionprops(flatImg, 'BoundingBox');
+                    z = flatStats(1).BoundingBox;
+                    stats(j).BoundingBox = z;
+                    h = ceil(z(2))+z(4);
+                    w = ceil(z(1))+z(3);
+                    boxHeight = ceil(z(2)):h;
+                    boxWidth = ceil(z(1)):w;
+                    symTmp = ~flatImg(boxHeight, boxWidth);
+                end
+                symbol{symCount} = symTmp;
+                loc(symCount) = {[ceil(z(2)) h ceil(z(1)) w]};
+                category(symCount) = keySyms(idx,2);
+                type(symCount) = keySyms(idx,3);
+                value(symCount) = keySyms(idx,4);
+                symIdx(symCount) = {ceil(z(1))};
+                edge(symCount) = edgeW+3;
+                symCount = symCount + 1;                
+                if (debug == 1)
+                    rectangle('Position',stats(j).BoundingBox, ...
+                        'EdgeColor','r', 'LineWidth',2);
+                end
+            end
+        end
+        
+        % Checks for time signature or notes only for boudary sections 
+        % of subsequent sections after 1
+        if (sectionCount == 1)
+            if ((z(3) >= 1.5*spaceHeight && z(3) <= 3*spaceHeight) && ... 
+                (z(4) >= 1.75*spaceHeight && z(4) <= 5.5*spaceHeight))
+                leftBounds = [leftBounds ceil(z(1))];      
+            end
+        end
+    end
+    
+    % Next part boundary definition based on section status
+    if (sectionCount == 1 && ~isempty(leftBounds))
+        newTermBound = min(leftBounds)-2; 
+    elseif (sectionCount == 1 && isempty(symbol))
+        newTermBound = initBound;
+    elseif (~(isempty(symbol) || ~isempty(leftBounds)))
+        newTermBound = max(edge)-2;
+    else
+        newTermBound = initBound;
+    end
+    
+    % Combine parameters for complete key definitions
+    if(isempty(symbol))
+        keys = [];
+    else
+        keys = [symbol', loc', category' type', value', symIdx'];        
+    end
+    
+    % Sets the number of total keys based on staff type (solo/grand)
+    if (length(newStaffLines) >= 10 && max(newStaffLines) ...
+        - min(newStaffLines) > 5*spaceHeight)
+        totalKeys = (symCount-1)/2;
+    else
+        totalKeys = symCount-1;
+    end
+    
+    % Key signature definition based on total key count 
+    if (totalKeys == 0)
+        keySig = 'C/Am';
+    else
+        % Key signature with sharp(s)
+        if (strcmpi(type{1},'sharp'))
+            if (totalKeys == 1)
+                keySig = 'G/Em';
+            elseif (totalKeys == 2)
+                keySig = 'D/Bm';
+            elseif (totalKeys == 3)
+                keySig = 'A/F#m';
+            elseif (totalKeys == 4)
+                keySig = 'E/C#m';
+            elseif (totalKeys == 5)
+                keySig = 'B/G#m';
+            elseif (totalKeys == 6)
+                keySig = 'F#/D#m';
+            elseif (totalKeys == 7)
+                keySig = 'C#/A#m';
+            end
+        % Key signature with flat(s)
+        else
+            if (totalKeys == 1)
+                keySig = 'F/Dm';
+            elseif (totalKeys == 2)
+                keySig = 'Bb/Gm';
+            elseif (totalKeys == 3)
+                keySig = 'Eb/Cm';
+            elseif (totalKeys == 4)
+                keySig = 'Ab/Fm';
+            elseif (totalKeys == 5)
+                keySig = 'Db/Bbm';
+            elseif (totalKeys == 6)
+                keySig = 'Gb/Ebm';
+            elseif (totalKeys == 7)
+                keySig = 'Cb/Abm';
+            end            
+        end
+    end
+    
+end
+##### SOURCE END #####
+--></body></html>

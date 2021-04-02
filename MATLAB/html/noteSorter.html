@@ -1,0 +1,268 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>noteSorter</title><meta name="generator" content="MATLAB 9.9"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2021-04-02"><meta name="DC.source" content="noteSorter.m"><style type="text/css">
+html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}:focus{outine:0}ins{text-decoration:none}del{text-decoration:line-through}table{border-collapse:collapse;border-spacing:0}
+
+html { min-height:100%; margin-bottom:1px; }
+html body { height:100%; margin:0px; font-family:Arial, Helvetica, sans-serif; font-size:10px; color:#000; line-height:140%; background:#fff none; overflow-y:scroll; }
+html body td { vertical-align:top; text-align:left; }
+
+h1 { padding:0px; margin:0px 0px 25px; font-family:Arial, Helvetica, sans-serif; font-size:1.5em; color:#d55000; line-height:100%; font-weight:normal; }
+h2 { padding:0px; margin:0px 0px 8px; font-family:Arial, Helvetica, sans-serif; font-size:1.2em; color:#000; font-weight:bold; line-height:140%; border-bottom:1px solid #d6d4d4; display:block; }
+h3 { padding:0px; margin:0px 0px 5px; font-family:Arial, Helvetica, sans-serif; font-size:1.1em; color:#000; font-weight:bold; line-height:140%; }
+
+a { color:#005fce; text-decoration:none; }
+a:hover { color:#005fce; text-decoration:underline; }
+a:visited { color:#004aa0; text-decoration:none; }
+
+p { padding:0px; margin:0px 0px 20px; }
+img { padding:0px; margin:0px 0px 20px; border:none; }
+p img, pre img, tt img, li img, h1 img, h2 img { margin-bottom:0px; }
+
+ul { padding:0px; margin:0px 0px 20px 23px; list-style:square; }
+ul li { padding:0px; margin:0px 0px 7px 0px; }
+ul li ul { padding:5px 0px 0px; margin:0px 0px 7px 23px; }
+ul li ol li { list-style:decimal; }
+ol { padding:0px; margin:0px 0px 20px 0px; list-style:decimal; }
+ol li { padding:0px; margin:0px 0px 7px 23px; list-style-type:decimal; }
+ol li ol { padding:5px 0px 0px; margin:0px 0px 7px 0px; }
+ol li ol li { list-style-type:lower-alpha; }
+ol li ul { padding-top:7px; }
+ol li ul li { list-style:square; }
+
+.content { font-size:1.2em; line-height:140%; padding: 20px; }
+
+pre, code { font-size:12px; }
+tt { font-size: 1.2em; }
+pre { margin:0px 0px 20px; }
+pre.codeinput { padding:10px; border:1px solid #d3d3d3; background:#f7f7f7; }
+pre.codeoutput { padding:10px 11px; margin:0px 0px 20px; color:#4c4c4c; }
+pre.error { color:red; }
+
+@media print { pre.codeinput, pre.codeoutput { word-wrap:break-word; width:100%; } }
+
+span.keyword { color:#0000FF }
+span.comment { color:#228B22 }
+span.string { color:#A020F0 }
+span.untermstring { color:#B20000 }
+span.syscmd { color:#B28C00 }
+span.typesection { color:#A0522D }
+
+.footer { width:auto; padding:10px 0px; margin:25px 0px 0px; border-top:1px dotted #878787; font-size:0.8em; line-height:140%; font-style:italic; color:#878787; text-align:left; float:none; }
+.footer p { margin:0px; }
+.footer a { color:#878787; }
+.footer a:hover { color:#878787; text-decoration:underline; }
+.footer a:visited { color:#878787; }
+
+table th { padding:7px 5px; text-align:left; vertical-align:middle; border: 1px solid #d6d4d4; font-weight:bold; }
+table td { padding:7px 5px; text-align:left; vertical-align:top; border:1px solid #d6d4d4; }
+
+
+
+
+
+  </style></head><body><div class="content"><pre class="codeinput"><span class="comment">%-------------------------------------------------------------------------</span>
+<span class="comment">% Function name:    noteSorter</span>
+<span class="comment">% Input arg(s):     section, ROI boundary, staff space/line heights</span>
+<span class="comment">% Outputs arg(s):   unbeamed, beamed, and other symbol sections</span>
+<span class="comment">% Description:      Sorts the components based on type (unbeamed notes,</span>
+<span class="comment">%                   beamed notes, or non-note symbols)</span>
+<span class="comment">%-------------------------------------------------------------------------</span>
+<span class="keyword">function</span> [unbeamedSec, beamedSec, otherSymsSec] = noteSorter(section, <span class="keyword">...</span>
+    bound, spaceHeight, lineHeight)
+
+    <span class="comment">% The ROI is the area just after the time signature's rightmost boundary</span>
+    tempImg = ones(size(section));
+    boundary = bound:size(section,2);
+    tempImg(:,boundary) = section(:,boundary);
+
+    <span class="comment">%---------------------------------------------------------------------</span>
+    <span class="comment">% First pass: Connected components that fall in the stemmed note/chord</span>
+    <span class="comment">% and whole note/chord category are sorted</span>
+    <span class="comment">%---------------------------------------------------------------------</span>
+    cc = bwconncomp(~tempImg);
+    unbeamedStats = regionprops(cc, <span class="string">'BoundingBox'</span>, <span class="string">'Eccentricity'</span>, <span class="keyword">...</span>
+        <span class="string">'Circularity'</span>);
+    unbeamedSec = ones(size(section));
+    <span class="keyword">for</span> i = 1:numel(unbeamedStats)
+        z = unbeamedStats(i).BoundingBox;
+        <span class="comment">% Symbols that fall under unbeamed category:</span>
+        <span class="comment">% - half-64th note/chords</span>
+        <span class="comment">% - whole notes/chords</span>
+        <span class="keyword">if</span> ((z(3) &gt;= 1.375*spaceHeight &amp;&amp; z(3) &lt;= 3.5*spaceHeight) &amp;&amp; <span class="keyword">...</span>
+            (z(4) &gt;= 2*spaceHeight &amp;&amp; z(4) &lt;= 15*spaceHeight))
+            <span class="comment">% Perform stem check on current symbol</span>
+            temp = ismember(labelmatrix(cc), i);
+            tempOpen = imopen(temp, strel(<span class="string">'line'</span>, (1.75*spaceHeight), 90));
+            stemStats = regionprops(tempOpen);
+
+            <span class="comment">% If stem(s) exist, it will be included in the unbeamed section</span>
+            <span class="keyword">if</span>(numel(stemStats) ~= 0)
+                unbeamedSec = xor(ismember(labelmatrix(cc),i), <span class="keyword">...</span>
+                    unbeamedSec);
+            <span class="keyword">end</span>
+        <span class="comment">% Potential single whole notes; circularity is added in the</span>
+        <span class="comment">% condition</span>
+        <span class="keyword">elseif</span> ((z(3) &gt;= 1.375*spaceHeight &amp;&amp; z(3) &lt;= 3.25*spaceHeight) <span class="keyword">...</span>
+            &amp;&amp; (z(4) &gt;= spaceHeight &amp;&amp; z(4) &lt;= (1.5*spaceHeight)) &amp;&amp; <span class="keyword">...</span>
+            (unbeamedStats(i).Circularity &gt; 0.2))
+            unbeamedSec = xor(ismember(labelmatrix(cc),i), unbeamedSec);
+        <span class="keyword">end</span>
+    <span class="keyword">end</span>
+    <span class="comment">% Remove potential unbeamed symbols from original section</span>
+    beamedSec = xor(tempImg, unbeamedSec);
+
+    <span class="comment">%---------------------------------------------------------------------</span>
+    <span class="comment">% Second pass: Connected components that fall in the other symbol</span>
+    <span class="comment">% category are sorted</span>
+    <span class="comment">%---------------------------------------------------------------------</span>
+    cc2 = bwconncomp(beamedSec);
+    otherStats = regionprops(cc2, <span class="string">'BoundingBox'</span>);
+    otherSymsSec = ones(size(section));
+    <span class="keyword">for</span> j = 1:numel(otherStats)
+        <span class="comment">% Bounding box parameters for second pass</span>
+        z2 = otherStats(j).BoundingBox;
+        <span class="keyword">if</span> (((z2(3) &lt; 20*spaceHeight)  &amp;&amp; <span class="keyword">...</span>
+            (z2(4) &lt; 3*spaceHeight)) || <span class="keyword">...</span>
+            ((z2(3) &lt; 3*spaceHeight)  &amp;&amp; <span class="keyword">...</span>
+            (z2(4) &lt; 6*spaceHeight)) || <span class="keyword">...</span>
+            z2(3) &lt;= spaceHeight)
+            otherSymsSec = xor(ismember(labelmatrix(cc2),j), otherSymsSec);
+        <span class="keyword">end</span>
+    <span class="keyword">end</span>
+    <span class="comment">% Remove potential other symbols from original section</span>
+    beamedSec = xor(beamedSec, ~otherSymsSec);
+
+    <span class="comment">%---------------------------------------------------------------------</span>
+    <span class="comment">% Third pass: Connected components that was initially counted as</span>
+    <span class="comment">% beamed notes will be sorted</span>
+    <span class="comment">%---------------------------------------------------------------------</span>
+    cc3 = bwconncomp(beamedSec);
+    beamedStats = regionprops(cc3, <span class="string">'BoundingBox'</span>);
+    <span class="keyword">for</span> k = 1:numel(beamedStats)
+        <span class="comment">% Perform opening on remaining symbols to detect stems</span>
+        tempImg3 = ismember(labelmatrix(cc3),k);
+        tempOpen = imopen(tempImg3, strel(<span class="string">'line'</span>, (2*spaceHeight + <span class="keyword">...</span>
+            3*lineHeight), 90));
+        stemStats2 = regionprops(tempOpen);
+
+        <span class="comment">% If two stems are detected, symbol is sent to beamed section,</span>
+        <span class="comment">% otherwise, sent to other symbol section</span>
+        <span class="keyword">if</span> (numel(stemStats2) &lt; 2)
+            otherSymsSec = xor(otherSymsSec, tempImg3);
+            beamedSec = xor(beamedSec, tempImg3);
+        <span class="keyword">end</span>
+    <span class="keyword">end</span>
+    <span class="comment">% Invert final result as beamed section</span>
+    beamedSec = ~beamedSec;
+<span class="keyword">end</span>
+</pre><pre class="codeoutput error">Not enough input arguments.
+
+Error in noteSorter (line 12)
+    tempImg = ones(size(section));
+</pre><p class="footer"><br><a href="https://www.mathworks.com/products/matlab/">Published with MATLAB&reg; R2020b</a><br></p></div><!--
+##### SOURCE BEGIN #####
+%REPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASH-
+% Function name:    noteSorter
+% Input arg(s):     section, ROI boundary, staff space/line heights
+% Outputs arg(s):   unbeamed, beamed, and other symbol sections
+% Description:      Sorts the components based on type (unbeamed notes, 
+%                   beamed notes, or non-note symbols)
+%REPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASH-
+function [unbeamedSec, beamedSec, otherSymsSec] = noteSorter(section, ...
+    bound, spaceHeight, lineHeight)
+
+    % The ROI is the area just after the time signature's rightmost boundary
+    tempImg = ones(size(section));
+    boundary = bound:size(section,2);
+    tempImg(:,boundary) = section(:,boundary);
+    
+    %REPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASH-
+    % First pass: Connected components that fall in the stemmed note/chord
+    % and whole note/chord category are sorted
+    %REPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASH-
+    cc = bwconncomp(~tempImg);
+    unbeamedStats = regionprops(cc, 'BoundingBox', 'Eccentricity', ...
+        'Circularity');
+    unbeamedSec = ones(size(section));
+    for i = 1:numel(unbeamedStats)
+        z = unbeamedStats(i).BoundingBox;
+        % Symbols that fall under unbeamed category:
+        % - half-64th note/chords     
+        % - whole notes/chords
+        if ((z(3) >= 1.375*spaceHeight && z(3) <= 3.5*spaceHeight) && ...
+            (z(4) >= 2*spaceHeight && z(4) <= 15*spaceHeight))
+            % Perform stem check on current symbol
+            temp = ismember(labelmatrix(cc), i);
+            tempOpen = imopen(temp, strel('line', (1.75*spaceHeight), 90));
+            stemStats = regionprops(tempOpen);
+
+            % If stem(s) exist, it will be included in the unbeamed section
+            if(numel(stemStats) ~= 0)
+                unbeamedSec = xor(ismember(labelmatrix(cc),i), ...
+                    unbeamedSec);
+            end
+        % Potential single whole notes; circularity is added in the
+        % condition
+        elseif ((z(3) >= 1.375*spaceHeight && z(3) <= 3.25*spaceHeight) ...
+            && (z(4) >= spaceHeight && z(4) <= (1.5*spaceHeight)) && ...
+            (unbeamedStats(i).Circularity > 0.2))
+            unbeamedSec = xor(ismember(labelmatrix(cc),i), unbeamedSec);
+        end
+    end
+    % Remove potential unbeamed symbols from original section
+    beamedSec = xor(tempImg, unbeamedSec);
+
+    %REPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASH-
+    % Second pass: Connected components that fall in the other symbol
+    % category are sorted
+    %REPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASH-
+    cc2 = bwconncomp(beamedSec);
+    otherStats = regionprops(cc2, 'BoundingBox');
+    otherSymsSec = ones(size(section));
+    for j = 1:numel(otherStats)
+        % Bounding box parameters for second pass
+        z2 = otherStats(j).BoundingBox;
+        if (((z2(3) < 20*spaceHeight)  && ...
+            (z2(4) < 3*spaceHeight)) || ...
+            ((z2(3) < 3*spaceHeight)  && ...
+            (z2(4) < 6*spaceHeight)) || ...
+            z2(3) <= spaceHeight)
+            otherSymsSec = xor(ismember(labelmatrix(cc2),j), otherSymsSec);
+        end
+    end
+    % Remove potential other symbols from original section
+    beamedSec = xor(beamedSec, ~otherSymsSec); 
+
+    %REPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASH-
+    % Third pass: Connected components that was initially counted as 
+    % beamed notes will be sorted
+    %REPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASH-
+    cc3 = bwconncomp(beamedSec);
+    beamedStats = regionprops(cc3, 'BoundingBox');
+    for k = 1:numel(beamedStats)
+        % Perform opening on remaining symbols to detect stems
+        tempImg3 = ismember(labelmatrix(cc3),k);
+        tempOpen = imopen(tempImg3, strel('line', (2*spaceHeight + ...
+            3*lineHeight), 90));
+        stemStats2 = regionprops(tempOpen);
+
+        % If two stems are detected, symbol is sent to beamed section, 
+        % otherwise, sent to other symbol section 
+        if (numel(stemStats2) < 2)
+            otherSymsSec = xor(otherSymsSec, tempImg3);
+            beamedSec = xor(beamedSec, tempImg3);
+        end
+    end
+    % Invert final result as beamed section
+    beamedSec = ~beamedSec;
+end
+
+##### SOURCE END #####
+--></body></html>

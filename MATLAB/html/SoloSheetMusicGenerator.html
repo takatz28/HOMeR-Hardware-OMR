@@ -1,0 +1,835 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>SoloSheetMusicGenerator</title><meta name="generator" content="MATLAB 9.9"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2021-04-02"><meta name="DC.source" content="SoloSheetMusicGenerator.m"><style type="text/css">
+html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}:focus{outine:0}ins{text-decoration:none}del{text-decoration:line-through}table{border-collapse:collapse;border-spacing:0}
+
+html { min-height:100%; margin-bottom:1px; }
+html body { height:100%; margin:0px; font-family:Arial, Helvetica, sans-serif; font-size:10px; color:#000; line-height:140%; background:#fff none; overflow-y:scroll; }
+html body td { vertical-align:top; text-align:left; }
+
+h1 { padding:0px; margin:0px 0px 25px; font-family:Arial, Helvetica, sans-serif; font-size:1.5em; color:#d55000; line-height:100%; font-weight:normal; }
+h2 { padding:0px; margin:0px 0px 8px; font-family:Arial, Helvetica, sans-serif; font-size:1.2em; color:#000; font-weight:bold; line-height:140%; border-bottom:1px solid #d6d4d4; display:block; }
+h3 { padding:0px; margin:0px 0px 5px; font-family:Arial, Helvetica, sans-serif; font-size:1.1em; color:#000; font-weight:bold; line-height:140%; }
+
+a { color:#005fce; text-decoration:none; }
+a:hover { color:#005fce; text-decoration:underline; }
+a:visited { color:#004aa0; text-decoration:none; }
+
+p { padding:0px; margin:0px 0px 20px; }
+img { padding:0px; margin:0px 0px 20px; border:none; }
+p img, pre img, tt img, li img, h1 img, h2 img { margin-bottom:0px; }
+
+ul { padding:0px; margin:0px 0px 20px 23px; list-style:square; }
+ul li { padding:0px; margin:0px 0px 7px 0px; }
+ul li ul { padding:5px 0px 0px; margin:0px 0px 7px 23px; }
+ul li ol li { list-style:decimal; }
+ol { padding:0px; margin:0px 0px 20px 0px; list-style:decimal; }
+ol li { padding:0px; margin:0px 0px 7px 23px; list-style-type:decimal; }
+ol li ol { padding:5px 0px 0px; margin:0px 0px 7px 0px; }
+ol li ol li { list-style-type:lower-alpha; }
+ol li ul { padding-top:7px; }
+ol li ul li { list-style:square; }
+
+.content { font-size:1.2em; line-height:140%; padding: 20px; }
+
+pre, code { font-size:12px; }
+tt { font-size: 1.2em; }
+pre { margin:0px 0px 20px; }
+pre.codeinput { padding:10px; border:1px solid #d3d3d3; background:#f7f7f7; }
+pre.codeoutput { padding:10px 11px; margin:0px 0px 20px; color:#4c4c4c; }
+pre.error { color:red; }
+
+@media print { pre.codeinput, pre.codeoutput { word-wrap:break-word; width:100%; } }
+
+span.keyword { color:#0000FF }
+span.comment { color:#228B22 }
+span.string { color:#A020F0 }
+span.untermstring { color:#B20000 }
+span.syscmd { color:#B28C00 }
+span.typesection { color:#A0522D }
+
+.footer { width:auto; padding:10px 0px; margin:25px 0px 0px; border-top:1px dotted #878787; font-size:0.8em; line-height:140%; font-style:italic; color:#878787; text-align:left; float:none; }
+.footer p { margin:0px; }
+.footer a { color:#878787; }
+.footer a:hover { color:#878787; text-decoration:underline; }
+.footer a:visited { color:#878787; }
+
+table th { padding:7px 5px; text-align:left; vertical-align:middle; border: 1px solid #d6d4d4; font-weight:bold; }
+table td { padding:7px 5px; text-align:left; vertical-align:top; border:1px solid #d6d4d4; }
+
+
+
+
+
+  </style></head><body><div class="content"><pre class="codeinput"><span class="comment">%-------------------------------------------------------------------------</span>
+<span class="comment">% Function name:    SoloSheetMusicGenerator</span>
+<span class="comment">% Input arg(s):     ledger/staff/space locations, pre/post-key pitches and</span>
+<span class="comment">%                   notes, total symbol list, space/line heights, time and</span>
+<span class="comment">%                   key signature array, note/beat file IDs</span>
+<span class="comment">% Description:      Produces a note and beat array based on the recon-</span>
+<span class="comment">%                   struction of the musical symbols on a solo section</span>
+<span class="comment">%-------------------------------------------------------------------------</span>
+<span class="keyword">function</span> SoloSheetMusicGenerator(totalSyms, totalTimeSignature, <span class="keyword">...</span>
+    ledgerStaffSpace, pitch, note, pitchPreKS, staffCenters, keyType, <span class="keyword">...</span>
+    keySigIdx, spaceHeight, lineHeight, fid1, fid2)
+
+    <span class="comment">% Generate reference indices for subsequent symbol locations</span>
+    totalSymsIdx = 1:length(totalSyms);
+    totalSymType = string(totalSyms(:,3));
+    <span class="comment">% Get indices of note/rest/barline symbols</span>
+    noteRestBarIdx = find(strcmp(totalSymType,<span class="string">"note"</span>) | <span class="keyword">...</span>
+         strcmp(totalSymType,<span class="string">"rest"</span>) | <span class="keyword">...</span>
+         strcmp(totalSymType,<span class="string">"barline"</span>));
+    <span class="comment">% Get indices of symbols that are not note/rest/barline</span>
+    nonNoteIdx = totalSymsIdx(~ismember(totalSymsIdx, noteRestBarIdx));
+    nonNoteSyms = totalSyms(nonNoteIdx,:);
+
+    <span class="comment">% Calculate reference centroids</span>
+    symbolLocs = cell2mat(totalSyms(:,2));
+    h1 = symbolLocs(:,1);
+    h2 = symbolLocs(:,2);
+    w1 = symbolLocs(:,3);
+    w2 = symbolLocs(:,4);
+    cent_x = (w1+w2)./2;
+    cent_y = (h1+h2)./2;
+
+    <span class="comment">% Modifiable buffers for pitch and note</span>
+    measurePitch = pitch;
+    measureNote = note;
+
+    <span class="comment">% Array initializers</span>
+    tiePresent = [];
+    visited = [];
+    totalNotes = [];
+
+    <span class="comment">% Process individual symbol detected by phase 2</span>
+    <span class="keyword">for</span> j = 1:size(totalSyms, 1)
+        <span class="comment">% Performs a type check if the symbol is either a note, rest,</span>
+        <span class="comment">% or barline</span>
+        isNote = strcmp(cell2mat(totalSyms(j,3)),<span class="string">'note'</span>);
+        isRest = strcmp(cell2mat(totalSyms(j,3)),<span class="string">'rest'</span>);
+        isBar = strcmp(cell2mat(totalSyms(j,3)),<span class="string">'barline'</span>);
+
+        <span class="comment">% If current symbol has already been processed, skip processing</span>
+        <span class="keyword">if</span>(ismember(j, sort(visited)))
+            <span class="keyword">continue</span>;
+        <span class="keyword">else</span>
+            <span class="comment">% In the case of solo sheets, a maximum of three notes can</span>
+            <span class="comment">% be played simultaneously</span>
+            noteBuf = string(zeros(1,3));
+            <span class="comment">% Add current symbol index to visited array</span>
+            visited = [visited; j];
+            <span class="comment">%------------------------------------------------------</span>
+            <span class="comment">% Note/rest check: Assigns pitch(es) and beat based on</span>
+            <span class="comment">% adjacencies (other notes/dot/accidental/fermata)</span>
+            <span class="comment">%------------------------------------------------------</span>
+            <span class="keyword">if</span> (isNote || isRest)
+                <span class="comment">% Calculate location of staff/ledger/space closest to</span>
+                <span class="comment">% symbol centroid</span>
+                [~, idx] = min(abs(ledgerStaffSpace - cent_y(j)));
+                <span class="keyword">if</span> (isNote)
+                    <span class="comment">% If symbol is a note, temporary pitch/note is based</span>
+                    <span class="comment">% on buffer values, while beat is based on default</span>
+                    tempPitch = measurePitch(idx);
+                    tempNote = measureNote(idx);
+                    tempBeat = cell2mat(totalSyms(j,5));
+                <span class="keyword">elseif</span> (isRest)
+                    <span class="comment">% If symbol is a rest, pitch is set to 0,</span>
+                    tempPitch = 0;
+                    tempNote = string(pitchTranslator(tempPitch));
+                    <span class="comment">% In the case of whole/half rest, beat value is</span>
+                    <span class="comment">% assigned based on location</span>
+                    <span class="keyword">if</span> (strcmp(string(totalSyms(j,4)), <span class="string">"wholehalf"</span>))
+                        [~, idx2] = min(abs(staffCenters - cent_y(j)));
+                        <span class="comment">% If the location is the third staffline, the rest</span>
+                        <span class="comment">% is a half rest</span>
+                        <span class="keyword">if</span> (idx2 == 3)
+                            tempBeat = 0.5;
+                        <span class="comment">% On the other hand, if location is second staff-</span>
+                        <span class="comment">% line, the rest if a whole rest</span>
+                        <span class="keyword">elseif</span> (idx2 == 2)
+                            temp = strsplit(string(totalTimeSignature(1,4)),<span class="string">'/'</span>);
+                            tempBeat = str2double(temp(1))/str2double(temp(2));
+                        <span class="keyword">end</span>
+                    <span class="comment">% For the rest of the staff lines, use the default</span>
+                    <span class="comment">% value</span>
+                    <span class="keyword">else</span>
+                        tempBeat = cell2mat(totalSyms(j,5));
+                    <span class="keyword">end</span>
+                <span class="keyword">end</span>
+
+                <span class="comment">%------------------------------------------------------</span>
+                <span class="comment">% Accidental locator and pitch re-assignment</span>
+                <span class="comment">% - Accidentals are typically located on the left-hand</span>
+                <span class="comment">%   side of notes</span>
+                <span class="comment">% - Modifies the note's pitch based on conditions</span>
+                <span class="comment">%------------------------------------------------------</span>
+                <span class="comment">% Find possible accidental on the note's LHS</span>
+                accidentalIdx = find((<span class="keyword">...</span>
+                    abs(cent_x(nonNoteIdx) - cent_x(j)) &lt; 4*spaceHeight) &amp; <span class="keyword">...</span>
+                    (abs(cent_y(nonNoteIdx) - cent_y(j)) &lt; 7*lineHeight) &amp; <span class="keyword">...</span>
+                    (cent_x(nonNoteIdx) &lt; cent_x(j)));
+                <span class="comment">% Checks if the symbol located is indeed an accidental</span>
+                <span class="keyword">if</span> (strcmp(string(nonNoteSyms(accidentalIdx,3)), <span class="keyword">...</span>
+                        <span class="string">"accidental"</span>))
+                    <span class="comment">% Returns the index of the staff/space/ledger</span>
+                    <span class="comment">% centroid closest to the accidental</span>
+                    [~, tempIdx] = min(abs(ledgerStaffSpace - cent_y(<span class="keyword">...</span>
+                        nonNoteIdx(accidentalIdx))));
+                    <span class="comment">% Natural accidental case: its value depends on current</span>
+                    <span class="comment">% line pitch</span>
+                    <span class="keyword">if</span> (strcmp(string(nonNoteSyms(accidentalIdx, 4)), <span class="keyword">...</span>
+                        <span class="string">"natural"</span>))
+                        <span class="comment">% if natural is found in a line with a sharp key,</span>
+                        <span class="comment">% or buffered pitch is higher than original pitch,</span>
+                        <span class="comment">% current pitch will be decreased by 1</span>
+                        <span class="keyword">if</span> ((ismember(tempIdx, keySigIdx) &amp;&amp; strcmp(<span class="keyword">...</span>
+                            keyType, <span class="string">"sharp"</span>)) || (measurePitch(<span class="keyword">...</span>
+                            tempIdx) &gt; pitchPreKS(tempIdx)))
+                            tempPitch = tempPitch - 1;
+                        <span class="comment">% if natural is found in a line with a flat key,</span>
+                        <span class="comment">% or buffered pitch is lower than original pitch,</span>
+                        <span class="comment">% current pitch will be increased by 1</span>
+                        <span class="keyword">elseif</span> ((ismember(tempIdx, keySigIdx) &amp;&amp; strcmp(<span class="keyword">...</span>
+                            keyType, <span class="string">"flat"</span>)) || (measurePitch(<span class="keyword">...</span>
+                            tempIdx) &lt; pitchPreKS(tempIdx)))
+                            tempPitch = tempPitch + 1;
+                        <span class="keyword">end</span>
+                    <span class="comment">% For flat/sharp, use default value</span>
+                    <span class="keyword">else</span>
+                        tempPitch = tempPitch + cell2mat(nonNoteSyms(<span class="keyword">...</span>
+                            accidentalIdx,5));
+                    <span class="keyword">end</span>
+                    <span class="comment">% Pitch/note buffers will be modified based on changes</span>
+                    <span class="comment">% made by accidentals</span>
+                    measurePitch(tempIdx) = tempPitch;
+                    tempNote = string(pitchTranslator(tempPitch));
+                    measureNote(tempIdx) = tempNote;
+                <span class="keyword">end</span>
+                <span class="comment">%------------------------------------------------------</span>
+                <span class="comment">% Accent dot locator and beat re-assignment</span>
+                <span class="comment">% - These are dots that are located on the right-hand</span>
+                <span class="comment">%   side of notes/rests</span>
+                <span class="comment">% - If found, increases the beat value by a factor of</span>
+                <span class="comment">%   1.5</span>
+                <span class="comment">%------------------------------------------------------</span>
+                <span class="comment">% First pass: Checks for symbols meeting the location</span>
+                <span class="comment">%     requirements</span>
+                accentDotIdx = find(<span class="keyword">...</span>
+                    (abs(cent_x(nonNoteIdx) - cent_x(j)) &lt;= 2.5*spaceHeight) &amp; <span class="keyword">...</span>
+                    (cent_y(j) - cent_y(nonNoteIdx) &lt;= 0.75*spaceHeight) &amp; <span class="keyword">...</span>
+                    (cent_y(j) - cent_y(nonNoteIdx) &gt;= -3*lineHeight) &amp; <span class="keyword">...</span>
+                    (cent_x(nonNoteIdx) &gt; cent_x(j)));
+                <span class="comment">% Second pass: Checks if the located symbol is a dot</span>
+                accentDotIdx = find(strcmp(string(nonNoteSyms(accentDotIdx,3)),<span class="keyword">...</span>
+                    <span class="string">"dot"</span>));
+
+                <span class="comment">%------------------------------------------------------</span>
+                <span class="comment">% Vertical symbol locator:</span>
+                <span class="comment">% - Locates symbols that are on top or bottom of the</span>
+                <span class="comment">%   current symbol, such as other notes, staccato</span>
+                <span class="comment">%   dots, fermatas, or edges of ties/slurs</span>
+                <span class="comment">%------------------------------------------------------</span>
+                <span class="comment">% First pass: Check for any vertical symbols regardless</span>
+                <span class="comment">%     of type</span>
+                verticalSyms = find((cent_y(totalSymsIdx) ~= cent_y(j)) &amp; <span class="keyword">...</span>
+                    (abs(cent_x(j) - cent_x(totalSymsIdx)) &lt;= 3*lineHeight));
+
+                <span class="comment">% Fermata case: Locate symbols matching the type</span>
+                fermataIdx = find(strcmp(string(totalSyms(verticalSyms,4)),<span class="keyword">...</span>
+                    <span class="string">"fermata"</span>));
+
+                <span class="comment">% Second pass: Check for any vertical symbols that are</span>
+                <span class="comment">%     close to the x-axis of the current note</span>
+                verticalSyms2 = find(<span class="keyword">...</span>
+                    (abs(cent_y(nonNoteIdx) - cent_y(j)) &lt;= 3*spaceHeight) &amp; <span class="keyword">...</span>
+                    (abs(cent_x(j) - cent_x(nonNoteIdx)) &lt;= 3*lineHeight));
+                <span class="comment">% Staccato dot case: Locate symbols matching description</span>
+                staccatoIdx = find(strcmp(string(nonNoteSyms(verticalSyms2,4)),<span class="keyword">...</span>
+                    <span class="string">"augmentation"</span>));
+
+
+                <span class="comment">%------------------------------------------------------</span>
+                <span class="comment">% Tie/slur locator and 'note break' assignment</span>
+                <span class="comment">% - Note break is a parameter which determines if</span>
+                <span class="comment">%   a note/s should be played without breaks</span>
+                <span class="comment">%------------------------------------------------------</span>
+                <span class="comment">% First pass: checks for left or right edges which are</span>
+                <span class="comment">%     found above or below a note</span>
+                tieSlurStart = find(abs(w1(nonNoteIdx) - cent_x(j)) &lt; <span class="keyword">...</span>
+                    0.5*spaceHeight);
+                tieSlurEnd = find(abs(w2(nonNoteIdx) - cent_x(j)) &lt; <span class="keyword">...</span>
+                    0.5*spaceHeight);
+                <span class="comment">% Second pass: check if symbol type is a tie or a slur</span>
+                tieSlurStartIdx = find(strcmp(string(nonNoteSyms(<span class="keyword">...</span>
+                    tieSlurStart,4)), <span class="string">"tie"</span>) | strcmp(string(totalSyms(<span class="keyword">...</span>
+                    tieSlurStart,4)), <span class="string">"slur"</span>));
+                tieSlurEndIdx = isempty(find(strcmp(string(nonNoteSyms(<span class="keyword">...</span>
+                    tieSlurEnd,4)), <span class="string">"tie"</span>) | strcmp(string(totalSyms(<span class="keyword">...</span>
+                    tieSlurEnd,4)), <span class="string">"slur"</span>),1));
+
+                <span class="comment">% If a tie/slur starting edge is detected, note break is</span>
+                <span class="comment">% set to 0</span>
+                <span class="keyword">if</span> (~isempty(tieSlurStartIdx))
+                    tiePresent = [tiePresent; tieSlurStartIdx];
+                    noteBreak = 0;
+                <span class="comment">% If end edge is detected, add a note break (set to 1)</span>
+                <span class="keyword">elseif</span>(~isempty(tieSlurEndIdx) &amp;&amp; ~isempty(tiePresent))
+                    tiePresent = [];
+                    noteBreak = 1;
+                <span class="comment">% If note is in between tie edges, note break is also</span>
+                <span class="comment">% set to 0</span>
+                <span class="keyword">elseif</span> (~isempty(tiePresent) &amp;&amp; (cent_x(j) &gt; tiePresent(1)))
+                    noteBreak = 0;
+                <span class="comment">% If above conditions are not met, set note break to 1</span>
+                <span class="keyword">else</span>
+                    noteBreak = 1;
+                <span class="keyword">end</span>
+
+                <span class="comment">% Third pass: Check for any vertical symbols that are notes</span>
+                <span class="comment">%     (maximum of 2)</span>
+                doubleStops = verticalSyms(strcmp(string(totalSyms(<span class="keyword">...</span>
+                    verticalSyms,3)), <span class="string">"note"</span>));
+                <span class="comment">% If they are detected, add indices to the visited array</span>
+                visited = [visited; doubleStops];
+
+                <span class="comment">% Process each double/triple stop note similar to previous</span>
+                <span class="comment">% note</span>
+                <span class="keyword">if</span> (~isempty(doubleStops))
+                    <span class="comment">% Add previous note to total notes array</span>
+                    totalNotes = [totalNotes; tempNote];
+
+                    <span class="keyword">for</span> jj = 1:length(doubleStops)
+                        <span class="comment">% Calculate location of staff/ledger/space closest to</span>
+                        <span class="comment">% symbol centroid</span>
+                        [~, idx] = min(abs(ledgerStaffSpace - cent_y(<span class="keyword">...</span>
+                            doubleStops(jj))));
+
+                        <span class="comment">% Pitch/note assignment based on buffers</span>
+                        tempPitch = measurePitch(idx);
+                        tempNote = measureNote(idx);
+
+                        <span class="comment">% Accidental locator</span>
+                        accidentalIdx = find((abs(cent_x(nonNoteIdx) - <span class="keyword">...</span>
+                            cent_x(doubleStops(jj))) &lt; 4*spaceHeight) &amp; <span class="keyword">...</span>
+                            (abs(cent_y(nonNoteIdx) - cent_y(doubleStops(<span class="keyword">...</span>
+                            jj))) &lt; 7*lineHeight) &amp; (cent_x(nonNoteIdx) &lt;<span class="keyword">...</span>
+                            cent_x(doubleStops(jj))));
+                        <span class="keyword">if</span> (strcmp(string(nonNoteSyms(accidentalIdx,3)), <span class="keyword">...</span>
+                                <span class="string">"accidental"</span>))
+                            [~, tempIdx] = min(abs(ledgerStaffSpace - <span class="keyword">...</span>
+                                cent_y(nonNoteIdx(accidentalIdx))));
+                            <span class="keyword">if</span> (strcmp(string(nonNoteSyms(accidentalIdx,<span class="keyword">...</span>
+                                4)), <span class="string">"natural"</span>))
+                                <span class="keyword">if</span> ((ismember(tempIdx, keySigIdx) &amp;&amp; <span class="keyword">...</span>
+                                    strcmp(keyType, <span class="string">"sharp"</span>)) || <span class="keyword">...</span>
+                                    (measurePitch(tempIdx) &gt; pitchPreKS(<span class="keyword">...</span>
+                                    tempIdx)))
+                                    tempPitch = tempPitch - 1;
+                                <span class="keyword">elseif</span> ((ismember(tempIdx, keySigIdx) &amp;&amp;<span class="keyword">...</span>
+                                    strcmp(keyType, <span class="string">"flat"</span>)) || <span class="keyword">...</span>
+                                    (measurePitch(tempIdx) &lt; pitchPreKS(<span class="keyword">...</span>
+                                    tempIdx)))
+                                    tempPitch = tempPitch + 1;
+                                <span class="keyword">end</span>
+                            <span class="keyword">else</span>
+                                tempPitch = tempPitch + cell2mat(<span class="keyword">...</span>
+                                    nonNoteSyms(accidentalIdx,5));
+                            <span class="keyword">end</span>
+                            measurePitch(tempIdx) = tempPitch;
+                            tempNote = string(pitchTranslator(tempPitch));
+                            measureNote(tempIdx) = tempNote;
+                        <span class="keyword">end</span>
+                        totalNotes = [totalNotes; tempNote];
+
+                        <span class="comment">% Vertical symbol locator</span>
+                        verticalSyms2 = find((abs(cent_y(nonNoteIdx) - <span class="keyword">...</span>
+                            cent_y(doubleStops(jj))) &lt;= 3*spaceHeight) &amp; <span class="keyword">...</span>
+                            (abs(cent_x(j) - cent_x(nonNoteIdx)) &lt;= <span class="keyword">...</span>
+                            3*lineHeight));
+                        <span class="comment">% Staccato dot locator</span>
+                        staccatoIdx2 = find(strcmp(string(nonNoteSyms(<span class="keyword">...</span>
+                            verticalSyms2,4)), <span class="string">"augmentation"</span>));
+                        <span class="comment">% Fermata locator</span>
+                        fermataIdx = find(strcmp(string(totalSyms(<span class="keyword">...</span>
+                            verticalSyms,4)), <span class="string">"fermata"</span>));
+                    <span class="keyword">end</span>
+
+                    <span class="comment">%---------------------------------------------</span>
+                    <span class="comment">% Final beat assignment based on exisiting</span>
+                    <span class="comment">%     symbols</span>
+                    <span class="comment">%---------------------------------------------</span>
+                    <span class="comment">% If accent dot exists, original beat is increase by</span>
+                    <span class="comment">% a factor of 1.5</span>
+                    <span class="keyword">if</span> (~isempty(accentDotIdx))
+                        tempBeat = tempBeat * 1.5;
+                    <span class="comment">% If accent dot doesn't exist and staccato dot exist,</span>
+                    <span class="comment">% original beat is deacreased in half</span>
+                    <span class="keyword">elseif</span> (~isempty(staccatoIdx) || ~isempty(staccatoIdx2))
+                        tempBeat = tempBeat * 0.5;
+                    <span class="comment">% If fermata exists, add 4 beats in the original beat</span>
+                    <span class="keyword">elseif</span> (~isempty(fermataIdx))
+                        tempBeat = tempBeat * cell2mat(nonNoteSyms(<span class="keyword">...</span>
+                            fermataIdx,5));
+                    <span class="keyword">end</span>
+
+                    <span class="comment">%-----------------------------------------------------</span>
+                    <span class="comment">% File writing procedure: THe format is as</span>
+                    <span class="comment">% follows:</span>
+                    <span class="comment">% - {note1, note2, note3, 0, 0, 0, 0, 0, note break}</span>
+                    <span class="comment">% - {..., beat, ...}</span>
+                    <span class="comment">%-----------------------------------------------------</span>
+                    noteBuf(1:length(totalNotes)) = totalNotes;
+                    fprintf(fid1,<span class="string">'\t{%s, %s, %s, 0, 0, 0, 0, 0, %d},\n'</span>,<span class="keyword">...</span>
+                        noteBuf, noteBreak);
+                    fprintf(fid2,<span class="string">'%.3f, '</span>, tempBeat);
+                    <span class="comment">% If fermata is detected, silence is added afterwards,</span>
+                    <span class="comment">% with the beat equiavalent to previous beat</span>
+                    <span class="keyword">if</span> (~isempty(staccatoIdx))
+                        fprintf(fid1,<span class="string">'\t{0, 0, 0, 0, 0, 0, 0, 0, %d},\n'</span>, <span class="keyword">...</span>
+                            noteBreak);
+                        fprintf(fid2,<span class="string">'%.3f, '</span>, tempBeat);
+                    <span class="keyword">end</span>
+                    totalNotes = [];
+                <span class="keyword">else</span>
+                    <span class="comment">%---------------------------------------------</span>
+                    <span class="comment">% Final beat assignment based on exisiting</span>
+                    <span class="comment">%     symbols</span>
+                    <span class="comment">%---------------------------------------------</span>
+                    <span class="comment">% If staccato exists, cut the original beat in half</span>
+                    <span class="keyword">if</span> (~isempty(staccatoIdx))
+                        tempBeat = tempBeat * 0.5;
+                    <span class="comment">% If accent dot exists, beat increases by a factor</span>
+                    <span class="comment">% of 1.5</span>
+                    <span class="keyword">elseif</span> (~isempty(accentDotIdx))
+                        tempBeat = tempBeat * 1.5;
+                    <span class="comment">% IF fermata exists, add 4 beats in the original beat</span>
+                    <span class="keyword">elseif</span> (~isempty(fermataIdx))
+                        tempBeat = tempBeat * cell2mat(nonNoteSyms(<span class="keyword">...</span>
+                            fermataIdx,5));
+                    <span class="keyword">end</span>
+
+                    <span class="comment">%-----------------------------------------------------</span>
+                    <span class="comment">% File writing procedure: THe format is as</span>
+                    <span class="comment">% follows:</span>
+                    <span class="comment">% - {note, 0, 0, 0, 0, 0, 0, 0, note break}</span>
+                    <span class="comment">% - {..., beat, ...}</span>
+                    <span class="comment">%-----------------------------------------------------</span>
+                    fprintf(fid1,<span class="string">'\t{%s, 0, 0, 0, 0, 0, 0, 0, %d},\n'</span>,<span class="keyword">...</span>
+                        tempNote, noteBreak);
+                    fprintf(fid2,<span class="string">'%.3f, '</span>, tempBeat);
+                    <span class="comment">% If fermata is detected, silence is added afterwards,</span>
+                    <span class="comment">% with the beat equiavalent to previous beat</span>
+                    <span class="keyword">if</span> (~isempty(staccatoIdx))
+                        fprintf(fid1,<span class="string">'\t{0, 0, 0, 0, 0, 0, 0, 0, %d},\n'</span>,<span class="keyword">...</span>
+                            noteBreak);
+                        fprintf(fid2,<span class="string">'%.3f, '</span>, tempBeat);
+                    <span class="keyword">end</span>
+                <span class="keyword">end</span>
+            <span class="comment">%---------------------------------------------</span>
+            <span class="comment">% Barline symbol check</span>
+            <span class="comment">%---------------------------------------------</span>
+            <span class="keyword">elseif</span>(isBar)
+                <span class="comment">% If barline is found, reset the pitch and note buffers</span>
+                measurePitch = pitch;
+                measureNote = note;
+                <span class="comment">% Add new lines to both note and beat input files</span>
+                fprintf(fid1, <span class="string">'\n'</span>);
+                fprintf(fid2, <span class="string">'\n\t'</span>);
+            <span class="keyword">end</span>
+        <span class="keyword">end</span>
+    <span class="keyword">end</span>
+<span class="keyword">end</span>
+</pre><pre class="codeoutput error">Not enough input arguments.
+
+Error in SoloSheetMusicGenerator (line 14)
+    totalSymsIdx = 1:length(totalSyms);
+</pre><p class="footer"><br><a href="https://www.mathworks.com/products/matlab/">Published with MATLAB&reg; R2020b</a><br></p></div><!--
+##### SOURCE BEGIN #####
+%REPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASH-
+% Function name:    SoloSheetMusicGenerator
+% Input arg(s):     ledger/staff/space locations, pre/post-key pitches and
+%                   notes, total symbol list, space/line heights, time and 
+%                   key signature array, note/beat file IDs
+% Description:      Produces a note and beat array based on the recon-
+%                   struction of the musical symbols on a solo section
+%REPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASH-
+function SoloSheetMusicGenerator(totalSyms, totalTimeSignature, ...
+    ledgerStaffSpace, pitch, note, pitchPreKS, staffCenters, keyType, ...
+    keySigIdx, spaceHeight, lineHeight, fid1, fid2)
+
+    % Generate reference indices for subsequent symbol locations
+    totalSymsIdx = 1:length(totalSyms);
+    totalSymType = string(totalSyms(:,3));
+    % Get indices of note/rest/barline symbols
+    noteRestBarIdx = find(strcmp(totalSymType,"note") | ...
+         strcmp(totalSymType,"rest") | ...
+         strcmp(totalSymType,"barline"));
+    % Get indices of symbols that are not note/rest/barline
+    nonNoteIdx = totalSymsIdx(~ismember(totalSymsIdx, noteRestBarIdx));
+    nonNoteSyms = totalSyms(nonNoteIdx,:);
+
+    % Calculate reference centroids
+    symbolLocs = cell2mat(totalSyms(:,2));
+    h1 = symbolLocs(:,1);
+    h2 = symbolLocs(:,2);
+    w1 = symbolLocs(:,3);
+    w2 = symbolLocs(:,4);
+    cent_x = (w1+w2)./2;
+    cent_y = (h1+h2)./2;
+
+    % Modifiable buffers for pitch and note
+    measurePitch = pitch;
+    measureNote = note;
+
+    % Array initializers
+    tiePresent = [];
+    visited = [];
+    totalNotes = [];
+
+    % Process individual symbol detected by phase 2
+    for j = 1:size(totalSyms, 1)
+        % Performs a type check if the symbol is either a note, rest, 
+        % or barline
+        isNote = strcmp(cell2mat(totalSyms(j,3)),'note');
+        isRest = strcmp(cell2mat(totalSyms(j,3)),'rest');
+        isBar = strcmp(cell2mat(totalSyms(j,3)),'barline');
+
+        % If current symbol has already been processed, skip processing    
+        if(ismember(j, sort(visited)))
+            continue;        
+        else
+            % In the case of solo sheets, a maximum of three notes can 
+            % be played simultaneously
+            noteBuf = string(zeros(1,3));
+            % Add current symbol index to visited array
+            visited = [visited; j];
+            %REPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASH
+            % Note/rest check: Assigns pitch(es) and beat based on 
+            % adjacencies (other notes/dot/accidental/fermata)
+            %REPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASH
+            if (isNote || isRest)
+                % Calculate location of staff/ledger/space closest to
+                % symbol centroid
+                [~, idx] = min(abs(ledgerStaffSpace - cent_y(j)));
+                if (isNote)
+                    % If symbol is a note, temporary pitch/note is based 
+                    % on buffer values, while beat is based on default 
+                    tempPitch = measurePitch(idx);
+                    tempNote = measureNote(idx);
+                    tempBeat = cell2mat(totalSyms(j,5));
+                elseif (isRest)
+                    % If symbol is a rest, pitch is set to 0,
+                    tempPitch = 0;
+                    tempNote = string(pitchTranslator(tempPitch));
+                    % In the case of whole/half rest, beat value is
+                    % assigned based on location
+                    if (strcmp(string(totalSyms(j,4)), "wholehalf"))
+                        [~, idx2] = min(abs(staffCenters - cent_y(j)));
+                        % If the location is the third staffline, the rest
+                        % is a half rest
+                        if (idx2 == 3)
+                            tempBeat = 0.5;
+                        % On the other hand, if location is second staff-
+                        % line, the rest if a whole rest
+                        elseif (idx2 == 2)
+                            temp = strsplit(string(totalTimeSignature(1,4)),'/');
+                            tempBeat = str2double(temp(1))/str2double(temp(2));
+                        end
+                    % For the rest of the staff lines, use the default 
+                    % value    
+                    else
+                        tempBeat = cell2mat(totalSyms(j,5));
+                    end
+                end
+
+                %REPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASH
+                % Accidental locator and pitch re-assignment
+                % - Accidentals are typically located on the left-hand 
+                %   side of notes
+                % - Modifies the note's pitch based on conditions
+                %REPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASH
+                % Find possible accidental on the note's LHS
+                accidentalIdx = find((...
+                    abs(cent_x(nonNoteIdx) - cent_x(j)) < 4*spaceHeight) & ...
+                    (abs(cent_y(nonNoteIdx) - cent_y(j)) < 7*lineHeight) & ...
+                    (cent_x(nonNoteIdx) < cent_x(j)));
+                % Checks if the symbol located is indeed an accidental
+                if (strcmp(string(nonNoteSyms(accidentalIdx,3)), ...
+                        "accidental"))
+                    % Returns the index of the staff/space/ledger 
+                    % centroid closest to the accidental
+                    [~, tempIdx] = min(abs(ledgerStaffSpace - cent_y(...
+                        nonNoteIdx(accidentalIdx))));
+                    % Natural accidental case: its value depends on current
+                    % line pitch 
+                    if (strcmp(string(nonNoteSyms(accidentalIdx, 4)), ...
+                        "natural"))
+                        % if natural is found in a line with a sharp key,
+                        % or buffered pitch is higher than original pitch, 
+                        % current pitch will be decreased by 1
+                        if ((ismember(tempIdx, keySigIdx) && strcmp(...
+                            keyType, "sharp")) || (measurePitch(...
+                            tempIdx) > pitchPreKS(tempIdx)))
+                            tempPitch = tempPitch - 1;
+                        % if natural is found in a line with a flat key,
+                        % or buffered pitch is lower than original pitch, 
+                        % current pitch will be increased by 1
+                        elseif ((ismember(tempIdx, keySigIdx) && strcmp(...
+                            keyType, "flat")) || (measurePitch(...
+                            tempIdx) < pitchPreKS(tempIdx)))
+                            tempPitch = tempPitch + 1;
+                        end
+                    % For flat/sharp, use default value
+                    else
+                        tempPitch = tempPitch + cell2mat(nonNoteSyms(...
+                            accidentalIdx,5));
+                    end
+                    % Pitch/note buffers will be modified based on changes
+                    % made by accidentals
+                    measurePitch(tempIdx) = tempPitch;
+                    tempNote = string(pitchTranslator(tempPitch));
+                    measureNote(tempIdx) = tempNote;
+                end
+                %REPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASH
+                % Accent dot locator and beat re-assignment
+                % - These are dots that are located on the right-hand
+                %   side of notes/rests 
+                % - If found, increases the beat value by a factor of 
+                %   1.5
+                %REPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASH
+                % First pass: Checks for symbols meeting the location
+                %     requirements
+                accentDotIdx = find(...
+                    (abs(cent_x(nonNoteIdx) - cent_x(j)) <= 2.5*spaceHeight) & ...
+                    (cent_y(j) - cent_y(nonNoteIdx) <= 0.75*spaceHeight) & ...
+                    (cent_y(j) - cent_y(nonNoteIdx) >= -3*lineHeight) & ...
+                    (cent_x(nonNoteIdx) > cent_x(j)));
+                % Second pass: Checks if the located symbol is a dot
+                accentDotIdx = find(strcmp(string(nonNoteSyms(accentDotIdx,3)),...
+                    "dot"));
+                 
+                %REPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASH
+                % Vertical symbol locator:
+                % - Locates symbols that are on top or bottom of the 
+                %   current symbol, such as other notes, staccato
+                %   dots, fermatas, or edges of ties/slurs
+                %REPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASH
+                % First pass: Check for any vertical symbols regardless
+                %     of type
+                verticalSyms = find((cent_y(totalSymsIdx) ~= cent_y(j)) & ...
+                    (abs(cent_x(j) - cent_x(totalSymsIdx)) <= 3*lineHeight)); 
+
+                % Fermata case: Locate symbols matching the type
+                fermataIdx = find(strcmp(string(totalSyms(verticalSyms,4)),...
+                    "fermata"));
+
+                % Second pass: Check for any vertical symbols that are 
+                %     close to the x-axis of the current note 
+                verticalSyms2 = find(...
+                    (abs(cent_y(nonNoteIdx) - cent_y(j)) <= 3*spaceHeight) & ...
+                    (abs(cent_x(j) - cent_x(nonNoteIdx)) <= 3*lineHeight));
+                % Staccato dot case: Locate symbols matching description
+                staccatoIdx = find(strcmp(string(nonNoteSyms(verticalSyms2,4)),...
+                    "augmentation"));
+
+                
+                %REPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASH
+                % Tie/slur locator and 'note break' assignment
+                % - Note break is a parameter which determines if 
+                %   a note/s should be played without breaks
+                %REPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASH
+                % First pass: checks for left or right edges which are  
+                %     found above or below a note
+                tieSlurStart = find(abs(w1(nonNoteIdx) - cent_x(j)) < ...
+                    0.5*spaceHeight);
+                tieSlurEnd = find(abs(w2(nonNoteIdx) - cent_x(j)) < ...
+                    0.5*spaceHeight);
+                % Second pass: check if symbol type is a tie or a slur
+                tieSlurStartIdx = find(strcmp(string(nonNoteSyms(...
+                    tieSlurStart,4)), "tie") | strcmp(string(totalSyms(...
+                    tieSlurStart,4)), "slur"));
+                tieSlurEndIdx = isempty(find(strcmp(string(nonNoteSyms(...
+                    tieSlurEnd,4)), "tie") | strcmp(string(totalSyms(...
+                    tieSlurEnd,4)), "slur"),1));
+
+                % If a tie/slur starting edge is detected, note break is 
+                % set to 0
+                if (~isempty(tieSlurStartIdx))
+                    tiePresent = [tiePresent; tieSlurStartIdx];
+                    noteBreak = 0;
+                % If end edge is detected, add a note break (set to 1)
+                elseif(~isempty(tieSlurEndIdx) && ~isempty(tiePresent))
+                    tiePresent = [];
+                    noteBreak = 1;
+                % If note is in between tie edges, note break is also 
+                % set to 0
+                elseif (~isempty(tiePresent) && (cent_x(j) > tiePresent(1)))
+                    noteBreak = 0;
+                % If above conditions are not met, set note break to 1
+                else
+                    noteBreak = 1;
+                end
+
+                % Third pass: Check for any vertical symbols that are notes
+                %     (maximum of 2)
+                doubleStops = verticalSyms(strcmp(string(totalSyms(...
+                    verticalSyms,3)), "note"));
+                % If they are detected, add indices to the visited array
+                visited = [visited; doubleStops];
+
+                % Process each double/triple stop note similar to previous
+                % note
+                if (~isempty(doubleStops))
+                    % Add previous note to total notes array
+                    totalNotes = [totalNotes; tempNote];
+
+                    for jj = 1:length(doubleStops)
+                        % Calculate location of staff/ledger/space closest to
+                        % symbol centroid
+                        [~, idx] = min(abs(ledgerStaffSpace - cent_y(...
+                            doubleStops(jj))));
+                        
+                        % Pitch/note assignment based on buffers
+                        tempPitch = measurePitch(idx);
+                        tempNote = measureNote(idx);
+
+                        % Accidental locator
+                        accidentalIdx = find((abs(cent_x(nonNoteIdx) - ...
+                            cent_x(doubleStops(jj))) < 4*spaceHeight) & ...
+                            (abs(cent_y(nonNoteIdx) - cent_y(doubleStops(...
+                            jj))) < 7*lineHeight) & (cent_x(nonNoteIdx) <...
+                            cent_x(doubleStops(jj))));
+                        if (strcmp(string(nonNoteSyms(accidentalIdx,3)), ...
+                                "accidental"))
+                            [~, tempIdx] = min(abs(ledgerStaffSpace - ...
+                                cent_y(nonNoteIdx(accidentalIdx))));
+                            if (strcmp(string(nonNoteSyms(accidentalIdx,...
+                                4)), "natural"))
+                                if ((ismember(tempIdx, keySigIdx) && ...
+                                    strcmp(keyType, "sharp")) || ...
+                                    (measurePitch(tempIdx) > pitchPreKS(...
+                                    tempIdx)))
+                                    tempPitch = tempPitch - 1;
+                                elseif ((ismember(tempIdx, keySigIdx) &&...
+                                    strcmp(keyType, "flat")) || ...
+                                    (measurePitch(tempIdx) < pitchPreKS(...
+                                    tempIdx)))
+                                    tempPitch = tempPitch + 1;
+                                end
+                            else
+                                tempPitch = tempPitch + cell2mat(...
+                                    nonNoteSyms(accidentalIdx,5));
+                            end
+                            measurePitch(tempIdx) = tempPitch;
+                            tempNote = string(pitchTranslator(tempPitch));
+                            measureNote(tempIdx) = tempNote;
+                        end
+                        totalNotes = [totalNotes; tempNote];
+
+                        % Vertical symbol locator
+                        verticalSyms2 = find((abs(cent_y(nonNoteIdx) - ...
+                            cent_y(doubleStops(jj))) <= 3*spaceHeight) & ...
+                            (abs(cent_x(j) - cent_x(nonNoteIdx)) <= ...
+                            3*lineHeight));
+                        % Staccato dot locator
+                        staccatoIdx2 = find(strcmp(string(nonNoteSyms(...
+                            verticalSyms2,4)), "augmentation"));
+                        % Fermata locator
+                        fermataIdx = find(strcmp(string(totalSyms(...
+                            verticalSyms,4)), "fermata"));
+                    end
+                    
+                    %REPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASH-
+                    % Final beat assignment based on exisiting
+                    %     symbols
+                    %REPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASH-
+                    % If accent dot exists, original beat is increase by 
+                    % a factor of 1.5
+                    if (~isempty(accentDotIdx))
+                        tempBeat = tempBeat * 1.5;
+                    % If accent dot doesn't exist and staccato dot exist, 
+                    % original beat is deacreased in half
+                    elseif (~isempty(staccatoIdx) || ~isempty(staccatoIdx2))
+                        tempBeat = tempBeat * 0.5;
+                    % If fermata exists, add 4 beats in the original beat
+                    elseif (~isempty(fermataIdx))
+                        tempBeat = tempBeat * cell2mat(nonNoteSyms(...
+                            fermataIdx,5));
+                    end
+                    
+                    %REPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASH-
+                    % File writing procedure: THe format is as 
+                    % follows:
+                    % - {note1, note2, note3, 0, 0, 0, 0, 0, note break}
+                    % - {..., beat, ...} 
+                    %REPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASH-
+                    noteBuf(1:length(totalNotes)) = totalNotes;
+                    fprintf(fid1,'\t{%s, %s, %s, 0, 0, 0, 0, 0, %d},\n',...
+                        noteBuf, noteBreak);
+                    fprintf(fid2,'%.3f, ', tempBeat);
+                    % If fermata is detected, silence is added afterwards,
+                    % with the beat equiavalent to previous beat
+                    if (~isempty(staccatoIdx))
+                        fprintf(fid1,'\t{0, 0, 0, 0, 0, 0, 0, 0, %d},\n', ...
+                            noteBreak);
+                        fprintf(fid2,'%.3f, ', tempBeat);                        
+                    end
+                    totalNotes = [];
+                else
+                    %REPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASH-
+                    % Final beat assignment based on exisiting
+                    %     symbols
+                    %REPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASH-
+                    % If staccato exists, cut the original beat in half
+                    if (~isempty(staccatoIdx))
+                        tempBeat = tempBeat * 0.5;
+                    % If accent dot exists, beat increases by a factor 
+                    % of 1.5
+                    elseif (~isempty(accentDotIdx))
+                        tempBeat = tempBeat * 1.5;
+                    % IF fermata exists, add 4 beats in the original beat
+                    elseif (~isempty(fermataIdx))
+                        tempBeat = tempBeat * cell2mat(nonNoteSyms(...
+                            fermataIdx,5));
+                    end
+                    
+                    %REPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASH-
+                    % File writing procedure: THe format is as 
+                    % follows:
+                    % - {note, 0, 0, 0, 0, 0, 0, 0, note break}
+                    % - {..., beat, ...} 
+                    %REPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASH-
+                    fprintf(fid1,'\t{%s, 0, 0, 0, 0, 0, 0, 0, %d},\n',...
+                        tempNote, noteBreak);
+                    fprintf(fid2,'%.3f, ', tempBeat);
+                    % If fermata is detected, silence is added afterwards,
+                    % with the beat equiavalent to previous beat
+                    if (~isempty(staccatoIdx))
+                        fprintf(fid1,'\t{0, 0, 0, 0, 0, 0, 0, 0, %d},\n',...
+                            noteBreak);
+                        fprintf(fid2,'%.3f, ', tempBeat);                        
+                    end
+                end
+            %REPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASH-
+            % Barline symbol check
+            %REPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASH-
+            elseif(isBar)
+                % If barline is found, reset the pitch and note buffers
+                measurePitch = pitch;
+                measureNote = note;
+                % Add new lines to both note and beat input files
+                fprintf(fid1, '\n');
+                fprintf(fid2, '\n\t');
+            end
+        end
+    end
+end
+##### SOURCE END #####
+--></body></html>

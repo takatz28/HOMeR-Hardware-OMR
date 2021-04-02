@@ -8,8 +8,7 @@
 function [unbeamedSec, beamedSec, otherSymsSec] = noteSorter(section, ...
     bound, spaceHeight, lineHeight)
 
-    % The ROI is the area just after the time signature's rightmost
-    % boundary
+    % The ROI is the area just after the time signature's rightmost boundary
     tempImg = ones(size(section));
     boundary = bound:size(section,2);
     tempImg(:,boundary) = section(:,boundary);
@@ -34,8 +33,7 @@ function [unbeamedSec, beamedSec, otherSymsSec] = noteSorter(section, ...
             tempOpen = imopen(temp, strel('line', (1.75*spaceHeight), 90));
             stemStats = regionprops(tempOpen);
 
-            % If stem(s) exist, it will be included in the unbeamed 
-            % section
+            % If stem(s) exist, it will be included in the unbeamed section
             if(numel(stemStats) ~= 0)
                 unbeamedSec = xor(ismember(labelmatrix(cc),i), ...
                     unbeamedSec);

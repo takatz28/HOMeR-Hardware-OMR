@@ -1,0 +1,1286 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>OMRApp</title><meta name="generator" content="MATLAB 9.9"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2021-04-02"><meta name="DC.source" content="OMRApp.m"><style type="text/css">
+html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}:focus{outine:0}ins{text-decoration:none}del{text-decoration:line-through}table{border-collapse:collapse;border-spacing:0}
+
+html { min-height:100%; margin-bottom:1px; }
+html body { height:100%; margin:0px; font-family:Arial, Helvetica, sans-serif; font-size:10px; color:#000; line-height:140%; background:#fff none; overflow-y:scroll; }
+html body td { vertical-align:top; text-align:left; }
+
+h1 { padding:0px; margin:0px 0px 25px; font-family:Arial, Helvetica, sans-serif; font-size:1.5em; color:#d55000; line-height:100%; font-weight:normal; }
+h2 { padding:0px; margin:0px 0px 8px; font-family:Arial, Helvetica, sans-serif; font-size:1.2em; color:#000; font-weight:bold; line-height:140%; border-bottom:1px solid #d6d4d4; display:block; }
+h3 { padding:0px; margin:0px 0px 5px; font-family:Arial, Helvetica, sans-serif; font-size:1.1em; color:#000; font-weight:bold; line-height:140%; }
+
+a { color:#005fce; text-decoration:none; }
+a:hover { color:#005fce; text-decoration:underline; }
+a:visited { color:#004aa0; text-decoration:none; }
+
+p { padding:0px; margin:0px 0px 20px; }
+img { padding:0px; margin:0px 0px 20px; border:none; }
+p img, pre img, tt img, li img, h1 img, h2 img { margin-bottom:0px; }
+
+ul { padding:0px; margin:0px 0px 20px 23px; list-style:square; }
+ul li { padding:0px; margin:0px 0px 7px 0px; }
+ul li ul { padding:5px 0px 0px; margin:0px 0px 7px 23px; }
+ul li ol li { list-style:decimal; }
+ol { padding:0px; margin:0px 0px 20px 0px; list-style:decimal; }
+ol li { padding:0px; margin:0px 0px 7px 23px; list-style-type:decimal; }
+ol li ol { padding:5px 0px 0px; margin:0px 0px 7px 0px; }
+ol li ol li { list-style-type:lower-alpha; }
+ol li ul { padding-top:7px; }
+ol li ul li { list-style:square; }
+
+.content { font-size:1.2em; line-height:140%; padding: 20px; }
+
+pre, code { font-size:12px; }
+tt { font-size: 1.2em; }
+pre { margin:0px 0px 20px; }
+pre.codeinput { padding:10px; border:1px solid #d3d3d3; background:#f7f7f7; }
+pre.codeoutput { padding:10px 11px; margin:0px 0px 20px; color:#4c4c4c; }
+pre.error { color:red; }
+
+@media print { pre.codeinput, pre.codeoutput { word-wrap:break-word; width:100%; } }
+
+span.keyword { color:#0000FF }
+span.comment { color:#228B22 }
+span.string { color:#A020F0 }
+span.untermstring { color:#B20000 }
+span.syscmd { color:#B28C00 }
+span.typesection { color:#A0522D }
+
+.footer { width:auto; padding:10px 0px; margin:25px 0px 0px; border-top:1px dotted #878787; font-size:0.8em; line-height:140%; font-style:italic; color:#878787; text-align:left; float:none; }
+.footer p { margin:0px; }
+.footer a { color:#878787; }
+.footer a:hover { color:#878787; text-decoration:underline; }
+.footer a:visited { color:#878787; }
+
+table th { padding:7px 5px; text-align:left; vertical-align:middle; border: 1px solid #d6d4d4; font-weight:bold; }
+table td { padding:7px 5px; text-align:left; vertical-align:top; border:1px solid #d6d4d4; }
+
+
+
+
+
+  </style></head><body><div class="content"><pre class="codeinput"><span class="keyword">classdef</span> HOMeR &lt; matlab.apps.AppBase
+
+    <span class="comment">% Properties that correspond to app components</span>
+    <span class="keyword">properties</span> (Access = public)
+        HOMeRUIFigure           <span class="typesection">matlab.ui.Figure</span>
+        FileMenu                <span class="typesection">matlab.ui.container.Menu</span>
+        ExitMenu                <span class="typesection">matlab.ui.container.Menu</span>
+        HelpMenu                <span class="typesection">matlab.ui.container.Menu</span>
+        InstructionsMenu        <span class="typesection">matlab.ui.container.Menu</span>
+        AboutMenu               <span class="typesection">matlab.ui.container.Menu</span>
+        Status                  <span class="typesection">matlab.ui.control.TextArea</span>
+        FirstButton             <span class="typesection">matlab.ui.control.Button</span>
+        LastButton              <span class="typesection">matlab.ui.control.Button</span>
+        PrevButton              <span class="typesection">matlab.ui.control.Button</span>
+        NextButton              <span class="typesection">matlab.ui.control.Button</span>
+        SectionnavigationLabel  <span class="typesection">matlab.ui.control.Label</span>
+        Panel                   <span class="typesection">matlab.ui.container.Panel</span>
+        ReadScoreButton         <span class="typesection">matlab.ui.control.Button</span>
+        ResetButton             <span class="typesection">matlab.ui.control.Button</span>
+        SelectimagesLabel       <span class="typesection">matlab.ui.control.Label</span>
+        BrowseButton            <span class="typesection">matlab.ui.control.Button</span>
+        ExportDataButton        <span class="typesection">matlab.ui.control.Button</span>
+        ScoreoptionsLabel       <span class="typesection">matlab.ui.control.Label</span>
+        PicCount                <span class="typesection">matlab.ui.control.Label</span>
+        SectionImg              <span class="typesection">matlab.ui.control.UIAxes</span>
+    <span class="keyword">end</span>
+
+    <span class="keyword">properties</span> (Access = public)
+        Property <span class="comment">% Description</span>
+        file
+        path
+        inputFile
+        fid1
+        fid2
+        debug = 0;
+        stop = 0;
+        totalSections = 0;
+        sectionBuf = {};
+        tempCount;
+    <span class="keyword">end</span>
+
+    <span class="keyword">methods</span> (Access = public)
+        <span class="keyword">function</span> ReadScore(app, inputImg, fid1, fid2)
+            <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+            <span class="comment">%%%%%%%         PHASE ONE: PREPROCESSING         %%%%%%%</span>
+            <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+            [img_bw, lineHeight, spaceHeight] = preprocess(inputImg);
+
+
+            <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+            <span class="comment">%%%%%%%   PHASE TWO: MUSIC SYMBOLS RECOGNITION   %%%%%%%</span>
+            <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+            <span class="comment">% Part 2.1: Staff detection, removal, and division</span>
+            [staffLines, staffHeights] = staffDetect(img_bw);
+            dividers = staffDivider(img_bw, staffLines, lineHeight, <span class="keyword">...</span>
+                spaceHeight);
+            img_no_staff = staffRemove(img_bw, staffLines, staffHeights, <span class="keyword">...</span>
+                spaceHeight);
+            [sections, newStaffLines] = scoreToSections(img_no_staff, <span class="keyword">...</span>
+                staffLines, dividers);
+
+            <span class="comment">% Part 2.2: Importing dataset for template matching</span>
+            [clef, key, timeSig, wholeNotes, rest, dot, other, <span class="keyword">...</span>
+                tieslur] = readDataset;
+            combined = [key; rest; other];
+
+            totalTimeSignature = [];
+            <span class="keyword">for</span> i = 1:length(sections)
+                app.totalSections = app.totalSections + 1;
+                <span class="keyword">if</span> (app.stop == 1)
+                    <span class="keyword">break</span>;
+                <span class="keyword">end</span>
+                app.Status.Value = [app.Status.Value;
+                    sprintf(<span class="string">"%s\nSECTION %d:"</span>, pad(<span class="string">'-'</span>, 100, <span class="string">'left'</span>, <span class="string">'-'</span>), <span class="keyword">...</span>
+                    app.totalSections)];
+
+                app.PicCount.Text = string(app.totalSections);
+                app.sectionBuf{app.totalSections} = sections{i};
+                I = imshow(app.sectionBuf{app.totalSections}, <span class="keyword">...</span>
+                    <span class="string">'Parent'</span>, app.SectionImg, <span class="keyword">...</span>
+                    <span class="string">'XData'</span>, [1 app.SectionImg.Position(3)], <span class="keyword">...</span>
+                    <span class="string">'YData'</span>, [1 app.SectionImg.Position(4)]);
+                app.SectionImg.XLim = [0 I.XData(2)];
+                app.SectionImg.YLim = [0 I.YData(2)];
+
+                <span class="comment">% Part 2.3: Clef detection</span>
+                [clefs, clefBound]  = detectClefs(sections{i}, spaceHeight, <span class="keyword">...</span>
+                    newStaffLines{i}, clef, app.debug);
+                temp = [];
+                <span class="keyword">for</span> jjj = 1:size(clefs,1)
+                    <span class="keyword">if</span> (app.stop ~= 1)
+                        temp = [temp, sprintf(<span class="string">'%s %s, '</span>,<span class="keyword">...</span>
+                        string(clefs(jjj,4)), string(clefs(jjj,3)))];
+                   <span class="keyword">end</span>
+                <span class="keyword">end</span>
+                app.Status.Value = [app.Status.Value; strcat(<span class="string">"Clefs: "</span>, temp)];
+
+                <span class="comment">% Part 2.4: Key signature detection</span>
+                <span class="keyword">if</span> (i == 1)
+                    [keySignature, keys, keyTemp] = detectKeySig(sections{i}, <span class="keyword">...</span>
+                        spaceHeight, i, newStaffLines{i}, clefBound, <span class="keyword">...</span>
+                        clefBound+10*spaceHeight, key, app.debug);
+                    keySigBound = keyTemp;
+                    app.Status.Value = [app.Status.Value; sprintf(<span class="keyword">...</span>
+                        <span class="string">'Key signature: %s,'</span>, keySignature)];
+                <span class="keyword">else</span>
+                    [keySignature, keys, keyTemp] = detectKeySig(<span class="keyword">...</span>
+                        sections{i}, spaceHeight, i, newStaffLines{i}, <span class="keyword">...</span>
+                        clefBound, keySigBound, key, app.debug);
+                    keySigBound = keyTemp;
+                    app.Status.Value = [app.Status.Value; sprintf(<span class="keyword">...</span>
+                        <span class="string">'Key signature: %s,'</span>, keySignature)];
+                <span class="keyword">end</span>
+
+                <span class="comment">% Part 2.5: Time signature detection</span>
+                [timeSignature, timeSigBound] = detectTimeSig(sections{i}, <span class="keyword">...</span>
+                    spaceHeight, keySigBound, timeSig, app.debug);
+
+                totalTimeSignature =  [totalTimeSignature; timeSignature];
+
+                <span class="keyword">if</span>(isempty(timeSignature))
+                    nextBound = keySigBound;
+                <span class="keyword">else</span>
+                    nextBound = timeSigBound;
+                    app.Status.Value = [app.Status.Value; sprintf(<span class="keyword">...</span>
+                        <span class="string">'Time signature: %s,'</span>, string(timeSignature(1,4)))];
+                <span class="keyword">end</span>
+
+                <span class="comment">% Part 2.6: Section sorting to unbeamed/beamed notes, and</span>
+                <span class="comment">% other symbols</span>
+                [unbeamedSec, beamedSec, otherSymsSec] = noteSorter(<span class="keyword">...</span>
+                    sections{i}, nextBound, spaceHeight, lineHeight);
+
+                <span class="comment">% Part 2.7: Unbeamed note detection</span>
+                <span class="keyword">if</span>(~isequal(zeros(size(sections{i})), unbeamedSec))
+                    [unbeamedNotes, ledgerLineLocs1] = detectUnbeamedNotes(<span class="keyword">...</span>
+                        unbeamedSec, spaceHeight, lineHeight, wholeNotes, <span class="keyword">...</span>
+                        app.debug);
+                <span class="keyword">end</span>
+                <span class="comment">% Part 2.8: Beamed note detection</span>
+                <span class="keyword">if</span>(~isequal(zeros(size(sections{i})), beamedSec))
+                    [beamedNotes, ledgerLineLocs2] = detectBeamedNotes(<span class="keyword">...</span>
+                        beamedSec, spaceHeight, app.debug);
+                <span class="keyword">end</span>
+
+                <span class="comment">% Part 2.9: Other symbol detection (rests, dots, ties, slurs,</span>
+                <span class="comment">% barlines)</span>
+                [otherSymbols, ledgerLineLocs3] = detectOtherSymbols(<span class="keyword">...</span>
+                    otherSymsSec, spaceHeight, lineHeight, <span class="keyword">...</span>
+                    newStaffLines{i}, combined, dot, tieslur, app.debug);
+
+                <span class="comment">% Part 2.10: Combining symbols sorted by horizontal location for next</span>
+                <span class="comment">% phase</span>
+                totalSyms = [unbeamedNotes; beamedNotes; otherSymbols];
+                totalSyms = sortrows(totalSyms, 6);
+                app.Status.Value = [app.Status.Value; sprintf(<span class="string">'Symbols:'</span>)];
+                <span class="keyword">for</span> jjj = 1:length(totalSyms)
+                    <span class="keyword">if</span> (app.stop ~= 1)
+                        app.Status.Value = [app.Status.Value; sprintf(<span class="string">'\t%s %s'</span>,<span class="keyword">...</span>
+                            string(totalSyms(jjj,4)), string(totalSyms(jjj,3)))];
+                   <span class="keyword">end</span>
+                <span class="keyword">end</span>
+                <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+                <span class="comment">%%%%%%%   PHASES 3/4: MUSIC NOTATION RECONSTRUCTION   %%%%%%</span>
+                <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+                <span class="comment">% Part 3.1 Calculating ledger/staff lines and staff space locations,</span>
+                <span class="comment">% and assigning appropriate pitches</span>
+                ledgerLineLocs = sort([ledgerLineLocs1; ledgerLineLocs2; <span class="keyword">...</span>
+                    ledgerLineLocs3]);
+                [ledgerStaffSpace, pitch, note, pitchPreKS, staffCenters, keyType, <span class="keyword">...</span>
+                    keySigIdx, grandStaffDivider] = finalStaffPitchAssignment(<span class="keyword">...</span>
+                    sections{i}, newStaffLines{i}, ledgerLineLocs, clefs, keys);
+
+                <span class="comment">% Part 3.2</span>
+                <span class="keyword">if</span> (isempty(grandStaffDivider))
+                    SoloSheetMusicGenerator(totalSyms, totalTimeSignature, <span class="keyword">...</span>
+                        ledgerStaffSpace,  pitch, note, pitchPreKS, <span class="keyword">...</span>
+                        staffCenters, keyType, keySigIdx, spaceHeight, <span class="keyword">...</span>
+                        lineHeight, fid1, fid2);
+                <span class="keyword">else</span>
+                    PianoSheetMusicGenerator(totalSyms, totalTimeSignature, <span class="keyword">...</span>
+                        ledgerStaffSpace, pitch, note, pitchPreKS, <span class="keyword">...</span>
+                        staffCenters, keyType, keySigIdx, spaceHeight, <span class="keyword">...</span>
+                        lineHeight, fid1, fid2);
+                <span class="keyword">end</span>
+
+                scroll(app.Status, <span class="string">'bottom'</span>);
+                pause(1);
+            <span class="keyword">end</span>
+        scroll(app.Status, <span class="string">'bottom'</span>);
+        <span class="keyword">end</span>
+    <span class="keyword">end</span>
+
+
+    <span class="comment">% Callbacks that handle component events</span>
+    <span class="keyword">methods</span> (Access = private)
+
+        <span class="comment">% Code that executes after component creation</span>
+        <span class="keyword">function</span> startupFcn(app)
+            movegui(app.HOMeRUIFigure,<span class="string">"center"</span>);
+            disableDefaultInteractivity(app.SectionImg);
+            app.SectionImg.Visible = false;
+            app.ExportDataButton.Enable = false;
+            app.ReadScoreButton.Enable = false;
+
+        <span class="keyword">end</span>
+
+        <span class="comment">% Button pushed function: BrowseButton</span>
+        <span class="keyword">function</span> BrowseButtonPushed(app, event)
+            app.FirstButton.Enable = false;
+            app.PrevButton.Enable = false;
+            app.NextButton.Enable = false;
+            app.LastButton.Enable = false;
+            [app.file,app.path] = uigetfile({<span class="string">'*.jpg'</span>;<span class="string">'*.png'</span>}, <span class="keyword">...</span>
+                <span class="string">'multiselect'</span>, <span class="string">'on'</span>);
+            cla(app.SectionImg);
+            app.totalSections = 0;
+            <span class="keyword">if</span> isequal(app.file, 0)
+                app.Status.Value = <span class="string">''</span>;
+                app.Status.Value = <span class="string">'User selection canceled.'</span>;
+            <span class="keyword">else</span>
+                app.Status.Value = <span class="string">''</span>;
+                app.inputFile = string(fullfile(app.path, app.file));
+                <span class="keyword">if</span> (length(app.inputFile) == 1)
+                    readStatus = strcat(<span class="string">'User selected'</span>, <span class="string">" "</span>, fullfile(<span class="keyword">...</span>
+                        app.path, app.file));
+                    app.Status.Value = [app.Status.Value; readStatus];
+                <span class="keyword">else</span>
+                    <span class="keyword">for</span> i = 1:length(app.inputFile)
+                        readStatus = strcat(<span class="string">'User selected'</span>, <span class="string">" "</span>, string(<span class="keyword">...</span>
+                            app.inputFile(i)));
+                        app.Status.Value = [app.Status.Value; readStatus];
+                    <span class="keyword">end</span>
+                <span class="keyword">end</span>
+                app.ReadScoreButton.Enable = true;
+                app.ExportDataButton.Enable = false;
+
+                dir = <span class="string">'OrganNotes.sdk\Synthesizer\src\'</span>;
+                outFile1 = <span class="string">'sheetNotes.h'</span>;
+                fullFile = strcat(dir, outFile1);
+                app.fid1 = fopen(fullFile, <span class="string">'w'</span>);
+
+                outFile2 = <span class="string">'sheetBeat.h'</span>;
+                fullFile = strcat(dir, outFile2);
+                app.fid2 = fopen(fullFile, <span class="string">'w'</span>);
+
+                fprintf(app.fid1,<span class="string">'#include "notes.h"\n\n'</span>);
+                fprintf(app.fid1,<span class="string">'int noteArray[][9] = \n{\n'</span>);
+                fprintf(app.fid2,<span class="string">'double beatArray[] = \n{\n\t'</span>);
+
+                app.stop = 0;
+            <span class="keyword">end</span>
+            app.PicCount.Text = <span class="string">""</span>;
+        <span class="keyword">end</span>
+
+        <span class="comment">% Button pushed function: ReadScoreButton</span>
+        <span class="keyword">function</span> ReadScoreButtonPushed(app, event)
+            app.totalSections = 0;
+            app.ReadScoreButton.Enable = false;
+            app.Status.Value = [app.Status.Value;
+                sprintf(<span class="string">"%s"</span>, pad(<span class="string">'-'</span>, 100, <span class="string">'left'</span>, <span class="string">'-'</span>))];
+           <span class="keyword">if</span> (length(app.inputFile) == 1)
+                scanStatus = strcat(<span class="string">'Scanning'</span>, <span class="string">" "</span>, app.file, <span class="string">'...'</span>);
+                tic
+                app.Status.Value = [app.Status.Value; scanStatus];
+                inputImg = imread(app.inputFile);
+                ReadScore(app, inputImg, app.fid1, app.fid2);
+                elapsed = toc;
+                app.Status.Value = [app.Status.Value;
+                    sprintf(<span class="string">"%s"</span>, pad(<span class="string">'-'</span>, 100, <span class="string">'left'</span>, <span class="string">'-'</span>))];
+            <span class="keyword">else</span>
+                tic
+                <span class="keyword">for</span> i = 1:length(app.inputFile)
+                    scanStatus = strcat(<span class="string">'Scanning'</span>, <span class="string">" "</span>, string(<span class="keyword">...</span>
+                        app.file(i)), <span class="string">" "</span>, <span class="string">'...'</span>);
+                    app.Status.Value = [app.Status.Value; scanStatus];
+                    inputImg = imread(cell2mat(app.inputFile(i)));
+                    ReadScore(app, inputImg, app.fid1, app.fid2);
+                    app.Status.Value = [app.Status.Value;
+                        sprintf(<span class="string">"%s"</span>, pad(<span class="string">'-'</span>, 100, <span class="string">'left'</span>, <span class="string">'-'</span>))];
+                <span class="keyword">end</span>
+                elapsed = toc;
+            <span class="keyword">end</span>
+
+            <span class="keyword">if</span> (app.stop ~= 1)
+                app.Status.Value = [app.Status.Value;
+                    sprintf(<span class="string">"Elapsed time: %.6f seconds"</span>, elapsed); <span class="keyword">...</span>
+                    sprintf(<span class="string">"%s"</span>, pad(<span class="string">'-'</span>, 100, <span class="string">'left'</span>, <span class="string">'-'</span>)); sprintf(<span class="keyword">...</span>
+                    <span class="string">"Please open Xilinx SDK to listen to the tune."</span>)];
+                scroll(app.Status, <span class="string">'bottom'</span>);
+
+                fprintf(app.fid1,<span class="string">'};'</span>);
+                fprintf(app.fid2,<span class="string">'\n};'</span>);
+                pause(1);
+
+                scroll(app.Status, <span class="string">'bottom'</span>);
+
+                app.FirstButton.Enable = true;
+                app.PrevButton.Enable = true;
+                app.ExportDataButton.Enable = true;
+                app.tempCount = app.totalSections;
+            <span class="keyword">end</span>
+
+        <span class="keyword">end</span>
+
+        <span class="comment">% Button pushed function: ResetButton</span>
+        <span class="keyword">function</span> ResetButtonPushed(app, event)
+            cla(app.SectionImg);
+            app.ExportDataButton.Enable = false;
+            app.ReadScoreButton.Enable = false;
+            app.FirstButton.Enable = false;
+            app.PrevButton.Enable = false;
+            app.NextButton.Enable = false;
+            app.LastButton.Enable = false;
+            app.Status.Value = <span class="string">""</span>;
+            app.stop = 1;
+            app.totalSections = 0;
+            app.PicCount.Text = <span class="string">""</span>;
+            close <span class="string">all</span>
+        <span class="keyword">end</span>
+
+        <span class="comment">% Button pushed function: FirstButton</span>
+        <span class="keyword">function</span> FirstButtonPushed(app, event)
+            app.tempCount = 1;
+            I = imshow(app.sectionBuf{app.tempCount}, <span class="keyword">...</span>
+                <span class="string">'Parent'</span>, app.SectionImg, <span class="keyword">...</span>
+                <span class="string">'XData'</span>, [1 app.SectionImg.Position(3)], <span class="keyword">...</span>
+                <span class="string">'YData'</span>, [1 app.SectionImg.Position(4)]);
+            <span class="comment">% Set limits of axes</span>
+            app.SectionImg.XLim = [0 I.XData(2)];
+            app.SectionImg.YLim = [0 I.YData(2)];
+            app.PicCount.Text = string(app.tempCount);
+            app.FirstButton.Enable = false;
+            app.PrevButton.Enable = false;
+            app.NextButton.Enable = true;
+            app.LastButton.Enable = true;
+        <span class="keyword">end</span>
+
+        <span class="comment">% Button pushed function: LastButton</span>
+        <span class="keyword">function</span> LastButtonPushed(app, event)
+            app.tempCount = app.totalSections;
+            I = imshow(app.sectionBuf{app.tempCount}, <span class="keyword">...</span>
+                <span class="string">'Parent'</span>, app.SectionImg, <span class="keyword">...</span>
+                <span class="string">'XData'</span>, [1 app.SectionImg.Position(3)], <span class="keyword">...</span>
+                <span class="string">'YData'</span>, [1 app.SectionImg.Position(4)]);
+            <span class="comment">% Set limits of axes</span>
+            app.SectionImg.XLim = [0 I.XData(2)];
+            app.SectionImg.YLim = [0 I.YData(2)];
+            app.PicCount.Text = string(app.tempCount);
+            app.FirstButton.Enable = true;
+            app.NextButton.Enable = false;
+            app.PrevButton.Enable = true;
+            app.LastButton.Enable = false;
+        <span class="keyword">end</span>
+
+        <span class="comment">% Button pushed function: NextButton</span>
+        <span class="keyword">function</span> NextButtonPushed(app, event)
+            app.tempCount = app.tempCount + 1;
+            I = imshow(app.sectionBuf{app.tempCount}, <span class="keyword">...</span>
+                <span class="string">'Parent'</span>, app.SectionImg, <span class="keyword">...</span>
+                <span class="string">'XData'</span>, [1 app.SectionImg.Position(3)], <span class="keyword">...</span>
+                <span class="string">'YData'</span>, [1 app.SectionImg.Position(4)]);
+            <span class="comment">% Set limits of axes</span>
+            app.SectionImg.XLim = [0 I.XData(2)];
+            app.SectionImg.YLim = [0 I.YData(2)];
+            app.PicCount.Text = string(app.tempCount);
+            <span class="keyword">if</span> (app.tempCount &lt; app.totalSections)
+                app.NextButton.Enable = true;
+                app.LastButton.Enable = true;
+            <span class="keyword">else</span>
+                app.NextButton.Enable = false;
+                app.LastButton.Enable = false;
+            <span class="keyword">end</span>
+            app.FirstButton.Enable = true;
+            app.PrevButton.Enable = true;
+
+        <span class="keyword">end</span>
+
+        <span class="comment">% Button pushed function: PrevButton</span>
+        <span class="keyword">function</span> PrevButtonPushed(app, event)
+            app.tempCount = app.tempCount - 1;
+            I = imshow(app.sectionBuf{app.tempCount}, <span class="keyword">...</span>
+                <span class="string">'Parent'</span>, app.SectionImg, <span class="keyword">...</span>
+                <span class="string">'XData'</span>, [1 app.SectionImg.Position(3)], <span class="keyword">...</span>
+                <span class="string">'YData'</span>, [1 app.SectionImg.Position(4)]);
+            <span class="comment">% Set limits of axes</span>
+            app.SectionImg.XLim = [0 I.XData(2)];
+            app.SectionImg.YLim = [0 I.YData(2)];
+            app.PicCount.Text = string(app.tempCount);
+            <span class="keyword">if</span> (app.tempCount &gt; 1 )
+                app.FirstButton.Enable = true;
+                app.PrevButton.Enable = true;
+            <span class="keyword">else</span>
+                app.FirstButton.Enable = false;
+                app.PrevButton.Enable = false;
+            <span class="keyword">end</span>
+            app.NextButton.Enable = true;
+            app.LastButton.Enable = true;
+        <span class="keyword">end</span>
+
+        <span class="comment">% Menu selected function: ExitMenu</span>
+        <span class="keyword">function</span> ExitMenuSelected(app, event)
+            app.delete;
+        <span class="keyword">end</span>
+
+        <span class="comment">% Button pushed function: ExportDataButton</span>
+        <span class="keyword">function</span> ExportDataButtonPushed(app, event)
+            scroll(app.Status, <span class="string">'bottom'</span>);
+            value = app.Status.Value;  <span class="comment">% Value entered in textArea</span>
+            fileName = strcat(<span class="string">'SheetData.txt'</span>);
+            f=fopen(fileName,<span class="string">'w'</span>);
+            formatSpec = <span class="string">"%s\n"</span>;
+            <span class="keyword">for</span> i =1:length(value)
+                fprintf(f,formatSpec,value{i});
+            <span class="keyword">end</span>
+            fclose(f);
+            app.Status.Value = [app.Status.Value; sprintf(<span class="keyword">...</span>
+                <span class="string">"%s"</span>, pad(<span class="string">'-'</span>, 100, <span class="string">'left'</span>, <span class="string">'-'</span>)); sprintf(<span class="keyword">...</span>
+                <span class="string">"Sheet music data exported."</span>)];
+            app.ExportDataButton.Enable = false;
+            pause(1);
+            scroll(app.Status, <span class="string">'bottom'</span>);
+
+
+        <span class="keyword">end</span>
+
+        <span class="comment">% Menu selected function: AboutMenu</span>
+        <span class="keyword">function</span> AboutMenuSelected(app, event)
+            About;
+        <span class="keyword">end</span>
+
+        <span class="comment">% Menu selected function: InstructionsMenu</span>
+        <span class="keyword">function</span> InstructionsMenuSelected(app, event)
+            Instructions;
+        <span class="keyword">end</span>
+    <span class="keyword">end</span>
+
+    <span class="comment">% Component initialization</span>
+    <span class="keyword">methods</span> (Access = private)
+
+        <span class="comment">% Create UIFigure and components</span>
+        <span class="keyword">function</span> createComponents(app)
+
+            <span class="comment">% Create HOMeRUIFigure and hide until all components are created</span>
+            app.HOMeRUIFigure = uifigure(<span class="string">'Visible'</span>, <span class="string">'off'</span>);
+            app.HOMeRUIFigure.Position = [100 100 910 610];
+            app.HOMeRUIFigure.Name = <span class="string">'HOMeR'</span>;
+            app.HOMeRUIFigure.Resize = <span class="string">'off'</span>;
+
+            <span class="comment">% Create FileMenu</span>
+            app.FileMenu = uimenu(app.HOMeRUIFigure);
+            app.FileMenu.Text = <span class="string">'File'</span>;
+
+            <span class="comment">% Create ExitMenu</span>
+            app.ExitMenu = uimenu(app.FileMenu);
+            app.ExitMenu.MenuSelectedFcn = createCallbackFcn(app, @ExitMenuSelected, true);
+            app.ExitMenu.Text = <span class="string">'Exit'</span>;
+
+            <span class="comment">% Create HelpMenu</span>
+            app.HelpMenu = uimenu(app.HOMeRUIFigure);
+            app.HelpMenu.Text = <span class="string">'Help'</span>;
+
+            <span class="comment">% Create InstructionsMenu</span>
+            app.InstructionsMenu = uimenu(app.HelpMenu);
+            app.InstructionsMenu.MenuSelectedFcn = createCallbackFcn(app, @InstructionsMenuSelected, true);
+            app.InstructionsMenu.Text = <span class="string">'Instructions'</span>;
+
+            <span class="comment">% Create AboutMenu</span>
+            app.AboutMenu = uimenu(app.HelpMenu);
+            app.AboutMenu.MenuSelectedFcn = createCallbackFcn(app, @AboutMenuSelected, true);
+            app.AboutMenu.Text = <span class="string">'About'</span>;
+
+            <span class="comment">% Create Status</span>
+            app.Status = uitextarea(app.HOMeRUIFigure);
+            app.Status.Editable = <span class="string">'off'</span>;
+            app.Status.FontName = <span class="string">'Cambria'</span>;
+            app.Status.FontSize = 14;
+            app.Status.Position = [361 313 535 270];
+
+            <span class="comment">% Create FirstButton</span>
+            app.FirstButton = uibutton(app.HOMeRUIFigure, <span class="string">'push'</span>);
+            app.FirstButton.ButtonPushedFcn = createCallbackFcn(app, @FirstButtonPushed, true);
+            app.FirstButton.Enable = <span class="string">'off'</span>;
+            app.FirstButton.Position = [730 16 39 22];
+            app.FirstButton.Text = <span class="string">'First'</span>;
+
+            <span class="comment">% Create LastButton</span>
+            app.LastButton = uibutton(app.HOMeRUIFigure, <span class="string">'push'</span>);
+            app.LastButton.ButtonPushedFcn = createCallbackFcn(app, @LastButtonPushed, true);
+            app.LastButton.Enable = <span class="string">'off'</span>;
+            app.LastButton.Position = [857 16 39 22];
+            app.LastButton.Text = <span class="string">'Last'</span>;
+
+            <span class="comment">% Create PrevButton</span>
+            app.PrevButton = uibutton(app.HOMeRUIFigure, <span class="string">'push'</span>);
+            app.PrevButton.ButtonPushedFcn = createCallbackFcn(app, @PrevButtonPushed, true);
+            app.PrevButton.Enable = <span class="string">'off'</span>;
+            app.PrevButton.Position = [774 16 25 22];
+            app.PrevButton.Text = <span class="string">'&lt;'</span>;
+
+            <span class="comment">% Create NextButton</span>
+            app.NextButton = uibutton(app.HOMeRUIFigure, <span class="string">'push'</span>);
+            app.NextButton.ButtonPushedFcn = createCallbackFcn(app, @NextButtonPushed, true);
+            app.NextButton.Enable = <span class="string">'off'</span>;
+            app.NextButton.Position = [826 16 26 22];
+            app.NextButton.Text = <span class="string">'&gt;'</span>;
+
+            <span class="comment">% Create SectionnavigationLabel</span>
+            app.SectionnavigationLabel = uilabel(app.HOMeRUIFigure);
+            app.SectionnavigationLabel.HorizontalAlignment = <span class="string">'right'</span>;
+            app.SectionnavigationLabel.Position = [615 16 107 22];
+            app.SectionnavigationLabel.Text = <span class="string">'Section navigation:'</span>;
+
+            <span class="comment">% Create Panel</span>
+            app.Panel = uipanel(app.HOMeRUIFigure);
+            app.Panel.Position = [19 313 322 270];
+
+            <span class="comment">% Create ReadScoreButton</span>
+            app.ReadScoreButton = uibutton(app.Panel, <span class="string">'push'</span>);
+            app.ReadScoreButton.ButtonPushedFcn = createCallbackFcn(app, @ReadScoreButtonPushed, true);
+            app.ReadScoreButton.Enable = <span class="string">'off'</span>;
+            app.ReadScoreButton.Position = [153 134 100 22];
+            app.ReadScoreButton.Text = <span class="string">'Read Score'</span>;
+
+            <span class="comment">% Create ResetButton</span>
+            app.ResetButton = uibutton(app.Panel, <span class="string">'push'</span>);
+            app.ResetButton.ButtonPushedFcn = createCallbackFcn(app, @ResetButtonPushed, true);
+            app.ResetButton.Position = [153 58 100 22];
+            app.ResetButton.Text = <span class="string">'Reset'</span>;
+
+            <span class="comment">% Create SelectimagesLabel</span>
+            app.SelectimagesLabel = uilabel(app.Panel);
+            app.SelectimagesLabel.Position = [47 194 107 22];
+            app.SelectimagesLabel.Text = <span class="string">'Select image(s): '</span>;
+
+            <span class="comment">% Create BrowseButton</span>
+            app.BrowseButton = uibutton(app.Panel, <span class="string">'push'</span>);
+            app.BrowseButton.ButtonPushedFcn = createCallbackFcn(app, @BrowseButtonPushed, true);
+            app.BrowseButton.Position = [153 194 100 22];
+            app.BrowseButton.Text = <span class="string">'Browse'</span>;
+
+            <span class="comment">% Create ExportDataButton</span>
+            app.ExportDataButton = uibutton(app.Panel, <span class="string">'push'</span>);
+            app.ExportDataButton.ButtonPushedFcn = createCallbackFcn(app, @ExportDataButtonPushed, true);
+            app.ExportDataButton.Enable = <span class="string">'off'</span>;
+            app.ExportDataButton.Position = [153 97 100 22];
+            app.ExportDataButton.Text = <span class="string">'Export Data'</span>;
+
+            <span class="comment">% Create ScoreoptionsLabel</span>
+            app.ScoreoptionsLabel = uilabel(app.Panel);
+            app.ScoreoptionsLabel.HorizontalAlignment = <span class="string">'right'</span>;
+            app.ScoreoptionsLabel.Position = [48 134 83 22];
+            app.ScoreoptionsLabel.Text = <span class="string">'Score options:'</span>;
+
+            <span class="comment">% Create PicCount</span>
+            app.PicCount = uilabel(app.HOMeRUIFigure);
+            app.PicCount.HorizontalAlignment = <span class="string">'center'</span>;
+            app.PicCount.Position = [798 15 29 25];
+            app.PicCount.Text = <span class="string">''</span>;
+
+            <span class="comment">% Create SectionImg</span>
+            app.SectionImg = uiaxes(app.HOMeRUIFigure);
+            app.SectionImg.Toolbar.Visible = <span class="string">'off'</span>;
+            app.SectionImg.XTick = [];
+            app.SectionImg.YTick = [];
+            app.SectionImg.Clipping = <span class="string">'off'</span>;
+            app.SectionImg.Visible = <span class="string">'off'</span>;
+            app.SectionImg.HandleVisibility = <span class="string">'off'</span>;
+            app.SectionImg.Interruptible = <span class="string">'off'</span>;
+            app.SectionImg.HitTest = <span class="string">'off'</span>;
+            app.SectionImg.Position = [1 40 910 265];
+
+            <span class="comment">% Show the figure after all components are created</span>
+            app.HOMeRUIFigure.Visible = <span class="string">'on'</span>;
+        <span class="keyword">end</span>
+    <span class="keyword">end</span>
+
+    <span class="comment">% App creation and deletion</span>
+    <span class="keyword">methods</span> (Access = public)
+
+        <span class="comment">% Construct app</span>
+        <span class="keyword">function</span> app = OMRApp_exported
+
+            <span class="comment">% Create UIFigure and components</span>
+            createComponents(app)
+
+            <span class="comment">% Register the app with App Designer</span>
+            registerApp(app, app.HOMeRUIFigure)
+
+            <span class="comment">% Execute the startup function</span>
+            runStartupFcn(app, @startupFcn)
+
+            <span class="keyword">if</span> nargout == 0
+                clear <span class="string">app</span>
+            <span class="keyword">end</span>
+        <span class="keyword">end</span>
+
+        <span class="comment">% Code that executes before app deletion</span>
+        <span class="keyword">function</span> delete(app)
+
+            <span class="comment">% Delete UIFigure when app is deleted</span>
+            delete(app.HOMeRUIFigure)
+        <span class="keyword">end</span>
+    <span class="keyword">end</span>
+<span class="keyword">end</span>
+</pre><pre class="codeoutput error">Error using dbstatus
+Error: File: C:\Users\tacat\Documents\GitHub\OMR\MATLAB\OMRApp.m Line: 1 Column: 10
+Class name and filename must match.
+</pre><p class="footer"><br><a href="https://www.mathworks.com/products/matlab/">Published with MATLAB&reg; R2020b</a><br></p></div><!--
+##### SOURCE BEGIN #####
+classdef HOMeR < matlab.apps.AppBase
+
+    % Properties that correspond to app components
+    properties (Access = public)
+        HOMeRUIFigure           matlab.ui.Figure
+        FileMenu                matlab.ui.container.Menu
+        ExitMenu                matlab.ui.container.Menu
+        HelpMenu                matlab.ui.container.Menu
+        InstructionsMenu        matlab.ui.container.Menu
+        AboutMenu               matlab.ui.container.Menu
+        Status                  matlab.ui.control.TextArea
+        FirstButton             matlab.ui.control.Button
+        LastButton              matlab.ui.control.Button
+        PrevButton              matlab.ui.control.Button
+        NextButton              matlab.ui.control.Button
+        SectionnavigationLabel  matlab.ui.control.Label
+        Panel                   matlab.ui.container.Panel
+        ReadScoreButton         matlab.ui.control.Button
+        ResetButton             matlab.ui.control.Button
+        SelectimagesLabel       matlab.ui.control.Label
+        BrowseButton            matlab.ui.control.Button
+        ExportDataButton        matlab.ui.control.Button
+        ScoreoptionsLabel       matlab.ui.control.Label
+        PicCount                matlab.ui.control.Label
+        SectionImg              matlab.ui.control.UIAxes
+    end
+
+    properties (Access = public)
+        Property % Description
+        file
+        path
+        inputFile
+        fid1
+        fid2
+        debug = 0;
+        stop = 0;
+        totalSections = 0;
+        sectionBuf = {};
+        tempCount;
+    end
+
+    methods (Access = public)
+        function ReadScore(app, inputImg, fid1, fid2)
+            %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+            %%%%%%%         PHASE ONE: PREPROCESSING         %%%%%%%
+            %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+            [img_bw, lineHeight, spaceHeight] = preprocess(inputImg);
+        
+            
+            %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+            %%%%%%%   PHASE TWO: MUSIC SYMBOLS RECOGNITION   %%%%%%%
+            %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+            % Part 2.1: Staff detection, removal, and division
+            [staffLines, staffHeights] = staffDetect(img_bw);
+            dividers = staffDivider(img_bw, staffLines, lineHeight, ...
+                spaceHeight);
+            img_no_staff = staffRemove(img_bw, staffLines, staffHeights, ...
+                spaceHeight);
+            [sections, newStaffLines] = scoreToSections(img_no_staff, ...
+                staffLines, dividers);
+        
+            % Part 2.2: Importing dataset for template matching
+            [clef, key, timeSig, wholeNotes, rest, dot, other, ...
+                tieslur] = readDataset;
+            combined = [key; rest; other];
+        
+            totalTimeSignature = [];
+            for i = 1:length(sections)
+                app.totalSections = app.totalSections + 1;
+                if (app.stop == 1)
+                    break;
+                end
+                app.Status.Value = [app.Status.Value; 
+                    sprintf("%s\nSECTION %d:", pad('-', 100, 'left', '-'), ...
+                    app.totalSections)];
+
+                app.PicCount.Text = string(app.totalSections);
+                app.sectionBuf{app.totalSections} = sections{i};
+                I = imshow(app.sectionBuf{app.totalSections}, ...
+                    'Parent', app.SectionImg, ...
+                    'XData', [1 app.SectionImg.Position(3)], ...
+                    'YData', [1 app.SectionImg.Position(4)]);
+                app.SectionImg.XLim = [0 I.XData(2)];
+                app.SectionImg.YLim = [0 I.YData(2)];    
+        
+                % Part 2.3: Clef detection
+                [clefs, clefBound]  = detectClefs(sections{i}, spaceHeight, ... 
+                    newStaffLines{i}, clef, app.debug);
+                temp = [];
+                for jjj = 1:size(clefs,1)
+                    if (app.stop ~= 1)
+                        temp = [temp, sprintf('%s %s, ',...
+                        string(clefs(jjj,4)), string(clefs(jjj,3)))]; 
+                   end
+                end
+                app.Status.Value = [app.Status.Value; strcat("Clefs: ", temp)];
+       
+                % Part 2.4: Key signature detection
+                if (i == 1)
+                    [keySignature, keys, keyTemp] = detectKeySig(sections{i}, ...
+                        spaceHeight, i, newStaffLines{i}, clefBound, ...
+                        clefBound+10*spaceHeight, key, app.debug);
+                    keySigBound = keyTemp;
+                    app.Status.Value = [app.Status.Value; sprintf(...
+                        'Key signature: %s,', keySignature)];
+                else
+                    [keySignature, keys, keyTemp] = detectKeySig(...
+                        sections{i}, spaceHeight, i, newStaffLines{i}, ...
+                        clefBound, keySigBound, key, app.debug);
+                    keySigBound = keyTemp;
+                    app.Status.Value = [app.Status.Value; sprintf(...
+                        'Key signature: %s,', keySignature)];
+                end
+        
+                % Part 2.5: Time signature detection
+                [timeSignature, timeSigBound] = detectTimeSig(sections{i}, ...
+                    spaceHeight, keySigBound, timeSig, app.debug);
+        
+                totalTimeSignature =  [totalTimeSignature; timeSignature];
+        
+                if(isempty(timeSignature))
+                    nextBound = keySigBound;
+                else
+                    nextBound = timeSigBound;
+                    app.Status.Value = [app.Status.Value; sprintf(...
+                        'Time signature: %s,', string(timeSignature(1,4)))];
+                end
+        
+                % Part 2.6: Section sorting to unbeamed/beamed notes, and 
+                % other symbols
+                [unbeamedSec, beamedSec, otherSymsSec] = noteSorter(...
+                    sections{i}, nextBound, spaceHeight, lineHeight);
+        
+                % Part 2.7: Unbeamed note detection
+                if(~isequal(zeros(size(sections{i})), unbeamedSec))
+                    [unbeamedNotes, ledgerLineLocs1] = detectUnbeamedNotes(...
+                        unbeamedSec, spaceHeight, lineHeight, wholeNotes, ...
+                        app.debug);    
+                end    
+                % Part 2.8: Beamed note detection
+                if(~isequal(zeros(size(sections{i})), beamedSec))
+                    [beamedNotes, ledgerLineLocs2] = detectBeamedNotes(...
+                        beamedSec, spaceHeight, app.debug);
+                end
+                
+                % Part 2.9: Other symbol detection (rests, dots, ties, slurs,
+                % barlines)
+                [otherSymbols, ledgerLineLocs3] = detectOtherSymbols(...
+                    otherSymsSec, spaceHeight, lineHeight, ...
+                    newStaffLines{i}, combined, dot, tieslur, app.debug);
+        
+                % Part 2.10: Combining symbols sorted by horizontal location for next
+                % phase
+                totalSyms = [unbeamedNotes; beamedNotes; otherSymbols];
+                totalSyms = sortrows(totalSyms, 6);
+                app.Status.Value = [app.Status.Value; sprintf('Symbols:')];  
+                for jjj = 1:length(totalSyms)
+                    if (app.stop ~= 1)
+                        app.Status.Value = [app.Status.Value; sprintf('\t%s %s',...
+                            string(totalSyms(jjj,4)), string(totalSyms(jjj,3)))];  
+                   end
+                end
+                %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+                %%%%%%%   PHASES 3/4: MUSIC NOTATION RECONSTRUCTION   %%%%%%
+                %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+                % Part 3.1 Calculating ledger/staff lines and staff space locations,
+                % and assigning appropriate pitches
+                ledgerLineLocs = sort([ledgerLineLocs1; ledgerLineLocs2; ...
+                    ledgerLineLocs3]);
+                [ledgerStaffSpace, pitch, note, pitchPreKS, staffCenters, keyType, ...
+                    keySigIdx, grandStaffDivider] = finalStaffPitchAssignment(...
+                    sections{i}, newStaffLines{i}, ledgerLineLocs, clefs, keys);
+        
+                % Part 3.2 
+                if (isempty(grandStaffDivider))
+                    SoloSheetMusicGenerator(totalSyms, totalTimeSignature, ...
+                        ledgerStaffSpace,  pitch, note, pitchPreKS, ...
+                        staffCenters, keyType, keySigIdx, spaceHeight, ...
+                        lineHeight, fid1, fid2);
+                else
+                    PianoSheetMusicGenerator(totalSyms, totalTimeSignature, ...
+                        ledgerStaffSpace, pitch, note, pitchPreKS, ...
+                        staffCenters, keyType, keySigIdx, spaceHeight, ...
+                        lineHeight, fid1, fid2);        
+                end
+
+                scroll(app.Status, 'bottom');
+                pause(1);
+            end
+        scroll(app.Status, 'bottom');
+        end  
+    end
+    
+
+    % Callbacks that handle component events
+    methods (Access = private)
+
+        % Code that executes after component creation
+        function startupFcn(app)
+            movegui(app.HOMeRUIFigure,"center");
+            disableDefaultInteractivity(app.SectionImg);
+            app.SectionImg.Visible = false;
+            app.ExportDataButton.Enable = false;
+            app.ReadScoreButton.Enable = false;
+
+        end
+
+        % Button pushed function: BrowseButton
+        function BrowseButtonPushed(app, event)
+            app.FirstButton.Enable = false;
+            app.PrevButton.Enable = false;
+            app.NextButton.Enable = false;
+            app.LastButton.Enable = false;
+            [app.file,app.path] = uigetfile({'*.jpg';'*.png'}, ...
+                'multiselect', 'on');
+            cla(app.SectionImg);
+            app.totalSections = 0;
+            if isequal(app.file, 0)
+                app.Status.Value = '';
+                app.Status.Value = 'User selection canceled.';
+            else
+                app.Status.Value = '';
+                app.inputFile = string(fullfile(app.path, app.file));
+                if (length(app.inputFile) == 1)
+                    readStatus = strcat('User selected', " ", fullfile(...
+                        app.path, app.file));
+                    app.Status.Value = [app.Status.Value; readStatus];                
+                else                
+                    for i = 1:length(app.inputFile)
+                        readStatus = strcat('User selected', " ", string(...
+                            app.inputFile(i)));
+                        app.Status.Value = [app.Status.Value; readStatus];                
+                    end
+                end
+                app.ReadScoreButton.Enable = true;
+                app.ExportDataButton.Enable = false;
+
+                dir = 'OrganNotes.sdk\Synthesizer\src\';
+                outFile1 = 'sheetNotes.h';
+                fullFile = strcat(dir, outFile1);
+                app.fid1 = fopen(fullFile, 'w');
+                
+                outFile2 = 'sheetBeat.h';
+                fullFile = strcat(dir, outFile2);
+                app.fid2 = fopen(fullFile, 'w');
+                
+                fprintf(app.fid1,'#include "notes.h"\n\n');
+                fprintf(app.fid1,'int noteArray[][9] = \n{\n');
+                fprintf(app.fid2,'double beatArray[] = \n{\n\t');
+
+                app.stop = 0;
+            end
+            app.PicCount.Text = "";
+        end
+
+        % Button pushed function: ReadScoreButton
+        function ReadScoreButtonPushed(app, event)
+            app.totalSections = 0;
+            app.ReadScoreButton.Enable = false;
+            app.Status.Value = [app.Status.Value; 
+                sprintf("%s", pad('-', 100, 'left', '-'))];
+           if (length(app.inputFile) == 1)
+                scanStatus = strcat('Scanning', " ", app.file, '...');
+                tic
+                app.Status.Value = [app.Status.Value; scanStatus];
+                inputImg = imread(app.inputFile);
+                ReadScore(app, inputImg, app.fid1, app.fid2);
+                elapsed = toc;
+                app.Status.Value = [app.Status.Value; 
+                    sprintf("%s", pad('-', 100, 'left', '-'))];
+            else
+                tic
+                for i = 1:length(app.inputFile)
+                    scanStatus = strcat('Scanning', " ", string(...
+                        app.file(i)), " ", '...');
+                    app.Status.Value = [app.Status.Value; scanStatus];
+                    inputImg = imread(cell2mat(app.inputFile(i)));
+                    ReadScore(app, inputImg, app.fid1, app.fid2);
+                    app.Status.Value = [app.Status.Value; 
+                        sprintf("%s", pad('-', 100, 'left', '-'))];
+                end
+                elapsed = toc;
+            end
+
+            if (app.stop ~= 1)
+                app.Status.Value = [app.Status.Value; 
+                    sprintf("Elapsed time: %.6f seconds", elapsed); ...
+                    sprintf("%s", pad('-', 100, 'left', '-')); sprintf(...
+                    "Please open Xilinx SDK to listen to the tune.")];
+                scroll(app.Status, 'bottom');
+                
+                fprintf(app.fid1,'};');
+                fprintf(app.fid2,'\n};');
+                pause(1);
+                
+                scroll(app.Status, 'bottom');
+
+                app.FirstButton.Enable = true;
+                app.PrevButton.Enable = true;
+                app.ExportDataButton.Enable = true;
+                app.tempCount = app.totalSections;
+            end
+
+        end
+
+        % Button pushed function: ResetButton
+        function ResetButtonPushed(app, event)
+            cla(app.SectionImg);
+            app.ExportDataButton.Enable = false;
+            app.ReadScoreButton.Enable = false;
+            app.FirstButton.Enable = false;
+            app.PrevButton.Enable = false;
+            app.NextButton.Enable = false;
+            app.LastButton.Enable = false;
+            app.Status.Value = "";
+            app.stop = 1;
+            app.totalSections = 0;
+            app.PicCount.Text = "";
+            close all
+        end
+
+        % Button pushed function: FirstButton
+        function FirstButtonPushed(app, event)
+            app.tempCount = 1;
+            I = imshow(app.sectionBuf{app.tempCount}, ...
+                'Parent', app.SectionImg, ...
+                'XData', [1 app.SectionImg.Position(3)], ...
+                'YData', [1 app.SectionImg.Position(4)]);
+            % Set limits of axes
+            app.SectionImg.XLim = [0 I.XData(2)];
+            app.SectionImg.YLim = [0 I.YData(2)];
+            app.PicCount.Text = string(app.tempCount);
+            app.FirstButton.Enable = false;
+            app.PrevButton.Enable = false;
+            app.NextButton.Enable = true;
+            app.LastButton.Enable = true;
+        end
+
+        % Button pushed function: LastButton
+        function LastButtonPushed(app, event)
+            app.tempCount = app.totalSections;
+            I = imshow(app.sectionBuf{app.tempCount}, ...
+                'Parent', app.SectionImg, ...
+                'XData', [1 app.SectionImg.Position(3)], ...
+                'YData', [1 app.SectionImg.Position(4)]);
+            % Set limits of axes
+            app.SectionImg.XLim = [0 I.XData(2)];
+            app.SectionImg.YLim = [0 I.YData(2)];
+            app.PicCount.Text = string(app.tempCount);
+            app.FirstButton.Enable = true;
+            app.NextButton.Enable = false;
+            app.PrevButton.Enable = true;
+            app.LastButton.Enable = false;
+        end
+
+        % Button pushed function: NextButton
+        function NextButtonPushed(app, event)
+            app.tempCount = app.tempCount + 1;
+            I = imshow(app.sectionBuf{app.tempCount}, ...
+                'Parent', app.SectionImg, ...
+                'XData', [1 app.SectionImg.Position(3)], ...
+                'YData', [1 app.SectionImg.Position(4)]);
+            % Set limits of axes
+            app.SectionImg.XLim = [0 I.XData(2)];
+            app.SectionImg.YLim = [0 I.YData(2)];
+            app.PicCount.Text = string(app.tempCount);
+            if (app.tempCount < app.totalSections)
+                app.NextButton.Enable = true;
+                app.LastButton.Enable = true;
+            else
+                app.NextButton.Enable = false;                
+                app.LastButton.Enable = false;
+            end
+            app.FirstButton.Enable = true;
+            app.PrevButton.Enable = true;
+
+        end
+
+        % Button pushed function: PrevButton
+        function PrevButtonPushed(app, event)
+            app.tempCount = app.tempCount - 1;
+            I = imshow(app.sectionBuf{app.tempCount}, ...
+                'Parent', app.SectionImg, ...
+                'XData', [1 app.SectionImg.Position(3)], ...
+                'YData', [1 app.SectionImg.Position(4)]);
+            % Set limits of axes
+            app.SectionImg.XLim = [0 I.XData(2)];
+            app.SectionImg.YLim = [0 I.YData(2)];
+            app.PicCount.Text = string(app.tempCount);
+            if (app.tempCount > 1 )
+                app.FirstButton.Enable = true;
+                app.PrevButton.Enable = true;
+            else
+                app.FirstButton.Enable = false;
+                app.PrevButton.Enable = false;                
+            end
+            app.NextButton.Enable = true;
+            app.LastButton.Enable = true;               
+        end
+
+        % Menu selected function: ExitMenu
+        function ExitMenuSelected(app, event)
+            app.delete;
+        end
+
+        % Button pushed function: ExportDataButton
+        function ExportDataButtonPushed(app, event)
+            scroll(app.Status, 'bottom');
+            value = app.Status.Value;  % Value entered in textArea
+            fileName = strcat('SheetData.txt');
+            f=fopen(fileName,'w');
+            formatSpec = "%s\n";  
+            for i =1:length(value)
+                fprintf(f,formatSpec,value{i});
+            end
+            fclose(f);
+            app.Status.Value = [app.Status.Value; sprintf(...
+                "%s", pad('-', 100, 'left', '-')); sprintf(...
+                "Sheet music data exported.")];
+            app.ExportDataButton.Enable = false;
+            pause(1);
+            scroll(app.Status, 'bottom');
+            
+            
+        end
+
+        % Menu selected function: AboutMenu
+        function AboutMenuSelected(app, event)
+            About;
+        end
+
+        % Menu selected function: InstructionsMenu
+        function InstructionsMenuSelected(app, event)
+            Instructions;
+        end
+    end
+
+    % Component initialization
+    methods (Access = private)
+
+        % Create UIFigure and components
+        function createComponents(app)
+
+            % Create HOMeRUIFigure and hide until all components are created
+            app.HOMeRUIFigure = uifigure('Visible', 'off');
+            app.HOMeRUIFigure.Position = [100 100 910 610];
+            app.HOMeRUIFigure.Name = 'HOMeR';
+            app.HOMeRUIFigure.Resize = 'off';
+
+            % Create FileMenu
+            app.FileMenu = uimenu(app.HOMeRUIFigure);
+            app.FileMenu.Text = 'File';
+
+            % Create ExitMenu
+            app.ExitMenu = uimenu(app.FileMenu);
+            app.ExitMenu.MenuSelectedFcn = createCallbackFcn(app, @ExitMenuSelected, true);
+            app.ExitMenu.Text = 'Exit';
+
+            % Create HelpMenu
+            app.HelpMenu = uimenu(app.HOMeRUIFigure);
+            app.HelpMenu.Text = 'Help';
+
+            % Create InstructionsMenu
+            app.InstructionsMenu = uimenu(app.HelpMenu);
+            app.InstructionsMenu.MenuSelectedFcn = createCallbackFcn(app, @InstructionsMenuSelected, true);
+            app.InstructionsMenu.Text = 'Instructions';
+
+            % Create AboutMenu
+            app.AboutMenu = uimenu(app.HelpMenu);
+            app.AboutMenu.MenuSelectedFcn = createCallbackFcn(app, @AboutMenuSelected, true);
+            app.AboutMenu.Text = 'About';
+
+            % Create Status
+            app.Status = uitextarea(app.HOMeRUIFigure);
+            app.Status.Editable = 'off';
+            app.Status.FontName = 'Cambria';
+            app.Status.FontSize = 14;
+            app.Status.Position = [361 313 535 270];
+
+            % Create FirstButton
+            app.FirstButton = uibutton(app.HOMeRUIFigure, 'push');
+            app.FirstButton.ButtonPushedFcn = createCallbackFcn(app, @FirstButtonPushed, true);
+            app.FirstButton.Enable = 'off';
+            app.FirstButton.Position = [730 16 39 22];
+            app.FirstButton.Text = 'First';
+
+            % Create LastButton
+            app.LastButton = uibutton(app.HOMeRUIFigure, 'push');
+            app.LastButton.ButtonPushedFcn = createCallbackFcn(app, @LastButtonPushed, true);
+            app.LastButton.Enable = 'off';
+            app.LastButton.Position = [857 16 39 22];
+            app.LastButton.Text = 'Last';
+
+            % Create PrevButton
+            app.PrevButton = uibutton(app.HOMeRUIFigure, 'push');
+            app.PrevButton.ButtonPushedFcn = createCallbackFcn(app, @PrevButtonPushed, true);
+            app.PrevButton.Enable = 'off';
+            app.PrevButton.Position = [774 16 25 22];
+            app.PrevButton.Text = '<';
+
+            % Create NextButton
+            app.NextButton = uibutton(app.HOMeRUIFigure, 'push');
+            app.NextButton.ButtonPushedFcn = createCallbackFcn(app, @NextButtonPushed, true);
+            app.NextButton.Enable = 'off';
+            app.NextButton.Position = [826 16 26 22];
+            app.NextButton.Text = '>';
+
+            % Create SectionnavigationLabel
+            app.SectionnavigationLabel = uilabel(app.HOMeRUIFigure);
+            app.SectionnavigationLabel.HorizontalAlignment = 'right';
+            app.SectionnavigationLabel.Position = [615 16 107 22];
+            app.SectionnavigationLabel.Text = 'Section navigation:';
+
+            % Create Panel
+            app.Panel = uipanel(app.HOMeRUIFigure);
+            app.Panel.Position = [19 313 322 270];
+
+            % Create ReadScoreButton
+            app.ReadScoreButton = uibutton(app.Panel, 'push');
+            app.ReadScoreButton.ButtonPushedFcn = createCallbackFcn(app, @ReadScoreButtonPushed, true);
+            app.ReadScoreButton.Enable = 'off';
+            app.ReadScoreButton.Position = [153 134 100 22];
+            app.ReadScoreButton.Text = 'Read Score';
+
+            % Create ResetButton
+            app.ResetButton = uibutton(app.Panel, 'push');
+            app.ResetButton.ButtonPushedFcn = createCallbackFcn(app, @ResetButtonPushed, true);
+            app.ResetButton.Position = [153 58 100 22];
+            app.ResetButton.Text = 'Reset';
+
+            % Create SelectimagesLabel
+            app.SelectimagesLabel = uilabel(app.Panel);
+            app.SelectimagesLabel.Position = [47 194 107 22];
+            app.SelectimagesLabel.Text = 'Select image(s): ';
+
+            % Create BrowseButton
+            app.BrowseButton = uibutton(app.Panel, 'push');
+            app.BrowseButton.ButtonPushedFcn = createCallbackFcn(app, @BrowseButtonPushed, true);
+            app.BrowseButton.Position = [153 194 100 22];
+            app.BrowseButton.Text = 'Browse';
+
+            % Create ExportDataButton
+            app.ExportDataButton = uibutton(app.Panel, 'push');
+            app.ExportDataButton.ButtonPushedFcn = createCallbackFcn(app, @ExportDataButtonPushed, true);
+            app.ExportDataButton.Enable = 'off';
+            app.ExportDataButton.Position = [153 97 100 22];
+            app.ExportDataButton.Text = 'Export Data';
+
+            % Create ScoreoptionsLabel
+            app.ScoreoptionsLabel = uilabel(app.Panel);
+            app.ScoreoptionsLabel.HorizontalAlignment = 'right';
+            app.ScoreoptionsLabel.Position = [48 134 83 22];
+            app.ScoreoptionsLabel.Text = 'Score options:';
+
+            % Create PicCount
+            app.PicCount = uilabel(app.HOMeRUIFigure);
+            app.PicCount.HorizontalAlignment = 'center';
+            app.PicCount.Position = [798 15 29 25];
+            app.PicCount.Text = '';
+
+            % Create SectionImg
+            app.SectionImg = uiaxes(app.HOMeRUIFigure);
+            app.SectionImg.Toolbar.Visible = 'off';
+            app.SectionImg.XTick = [];
+            app.SectionImg.YTick = [];
+            app.SectionImg.Clipping = 'off';
+            app.SectionImg.Visible = 'off';
+            app.SectionImg.HandleVisibility = 'off';
+            app.SectionImg.Interruptible = 'off';
+            app.SectionImg.HitTest = 'off';
+            app.SectionImg.Position = [1 40 910 265];
+
+            % Show the figure after all components are created
+            app.HOMeRUIFigure.Visible = 'on';
+        end
+    end
+
+    % App creation and deletion
+    methods (Access = public)
+
+        % Construct app
+        function app = OMRApp_exported
+
+            % Create UIFigure and components
+            createComponents(app)
+
+            % Register the app with App Designer
+            registerApp(app, app.HOMeRUIFigure)
+
+            % Execute the startup function
+            runStartupFcn(app, @startupFcn)
+
+            if nargout == 0
+                clear app
+            end
+        end
+
+        % Code that executes before app deletion
+        function delete(app)
+
+            % Delete UIFigure when app is deleted
+            delete(app.HOMeRUIFigure)
+        end
+    end
+end
+##### SOURCE END #####
+--></body></html>

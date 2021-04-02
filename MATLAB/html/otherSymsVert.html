@@ -1,0 +1,339 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>otherSymsVert</title><meta name="generator" content="MATLAB 9.9"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2021-04-02"><meta name="DC.source" content="otherSymsVert.m"><style type="text/css">
+html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}:focus{outine:0}ins{text-decoration:none}del{text-decoration:line-through}table{border-collapse:collapse;border-spacing:0}
+
+html { min-height:100%; margin-bottom:1px; }
+html body { height:100%; margin:0px; font-family:Arial, Helvetica, sans-serif; font-size:10px; color:#000; line-height:140%; background:#fff none; overflow-y:scroll; }
+html body td { vertical-align:top; text-align:left; }
+
+h1 { padding:0px; margin:0px 0px 25px; font-family:Arial, Helvetica, sans-serif; font-size:1.5em; color:#d55000; line-height:100%; font-weight:normal; }
+h2 { padding:0px; margin:0px 0px 8px; font-family:Arial, Helvetica, sans-serif; font-size:1.2em; color:#000; font-weight:bold; line-height:140%; border-bottom:1px solid #d6d4d4; display:block; }
+h3 { padding:0px; margin:0px 0px 5px; font-family:Arial, Helvetica, sans-serif; font-size:1.1em; color:#000; font-weight:bold; line-height:140%; }
+
+a { color:#005fce; text-decoration:none; }
+a:hover { color:#005fce; text-decoration:underline; }
+a:visited { color:#004aa0; text-decoration:none; }
+
+p { padding:0px; margin:0px 0px 20px; }
+img { padding:0px; margin:0px 0px 20px; border:none; }
+p img, pre img, tt img, li img, h1 img, h2 img { margin-bottom:0px; }
+
+ul { padding:0px; margin:0px 0px 20px 23px; list-style:square; }
+ul li { padding:0px; margin:0px 0px 7px 0px; }
+ul li ul { padding:5px 0px 0px; margin:0px 0px 7px 23px; }
+ul li ol li { list-style:decimal; }
+ol { padding:0px; margin:0px 0px 20px 0px; list-style:decimal; }
+ol li { padding:0px; margin:0px 0px 7px 23px; list-style-type:decimal; }
+ol li ol { padding:5px 0px 0px; margin:0px 0px 7px 0px; }
+ol li ol li { list-style-type:lower-alpha; }
+ol li ul { padding-top:7px; }
+ol li ul li { list-style:square; }
+
+.content { font-size:1.2em; line-height:140%; padding: 20px; }
+
+pre, code { font-size:12px; }
+tt { font-size: 1.2em; }
+pre { margin:0px 0px 20px; }
+pre.codeinput { padding:10px; border:1px solid #d3d3d3; background:#f7f7f7; }
+pre.codeoutput { padding:10px 11px; margin:0px 0px 20px; color:#4c4c4c; }
+pre.error { color:red; }
+
+@media print { pre.codeinput, pre.codeoutput { word-wrap:break-word; width:100%; } }
+
+span.keyword { color:#0000FF }
+span.comment { color:#228B22 }
+span.string { color:#A020F0 }
+span.untermstring { color:#B20000 }
+span.syscmd { color:#B28C00 }
+span.typesection { color:#A0522D }
+
+.footer { width:auto; padding:10px 0px; margin:25px 0px 0px; border-top:1px dotted #878787; font-size:0.8em; line-height:140%; font-style:italic; color:#878787; text-align:left; float:none; }
+.footer p { margin:0px; }
+.footer a { color:#878787; }
+.footer a:hover { color:#878787; text-decoration:underline; }
+.footer a:visited { color:#878787; }
+
+table th { padding:7px 5px; text-align:left; vertical-align:middle; border: 1px solid #d6d4d4; font-weight:bold; }
+table td { padding:7px 5px; text-align:left; vertical-align:top; border:1px solid #d6d4d4; }
+
+
+
+
+
+  </style></head><body><div class="content"><pre class="codeinput"><span class="comment">%-------------------------------------------------------------------------</span>
+<span class="comment">% Function name:    otherSymsVert</span>
+<span class="comment">% Input arg(s):     non-note section, staff space/line heights, non-note</span>
+<span class="comment">%                   dataset except tie/slur</span>
+<span class="comment">% Outputs arg(s):   other symbols and section with detected symbols</span>
+<span class="comment">% Description:      Detects non-note symbols after vertical connection</span>
+<span class="comment">%                   of components</span>
+<span class="comment">%-------------------------------------------------------------------------</span>
+<span class="keyword">function</span> [otherSymsArr, newSection] = otherSymsVert(section, stats, <span class="keyword">...</span>
+    spaceHeight, combinedSyms, dotSyms, debug)
+
+    newSection = ones(size(section));
+    symbol = {};
+    loc = {};
+    category = {};
+    type = {};
+    value = {};
+    symIdx = {};
+    symCount = 1;
+
+    <span class="comment">% Goes through the image based on individual bounding boxes</span>
+    <span class="keyword">for</span> j = 1:numel(stats)
+        <span class="comment">% Extract component boundaries</span>
+        z = stats(j).BoundingBox;
+        h = ceil(z(2))+ceil(z(4));
+        w = ceil(z(1))+ceil(z(3));
+        <span class="comment">% Limits the boundaries when it reaches upper/lower bounds</span>
+        <span class="keyword">if</span> (h &lt; 1)
+            h = 1;
+        <span class="keyword">elseif</span> (w &lt; 1)
+            w = 1;
+        <span class="keyword">elseif</span> (h &gt;= size(section,1))
+            h = size(section,1)-1;
+        <span class="keyword">elseif</span> (w &gt;= size(section,2))
+            w = size(section,2)-1;
+        <span class="keyword">end</span>
+        boxHeight1 = ceil(z(2)):h;
+        boxWidth1 = ceil(z(1)):w;
+
+        <span class="comment">% Isolate component before template matching</span>
+        symTmp = section(boxHeight1, boxWidth1);
+
+        <span class="comment">% Check if component meets the height and width criteria</span>
+        <span class="keyword">if</span> ((z(3) &gt;= 3 &amp;&amp; z(3) &lt;= 3.5*spaceHeight) &amp;&amp; <span class="keyword">...</span>
+            (z(4) &gt;= 3 &amp;&amp; z(4) &lt;= 6*spaceHeight))
+            <span class="comment">% Potential dots are smaller than spaceheight, and the</span>
+            <span class="comment">% absolute difference between the length and width is 1</span>
+            <span class="keyword">if</span>(((z(3)-z(4) == 1) || (z(3)-z(4) == -1) || <span class="keyword">...</span>
+                (z(3)-z(4) == 0)) &amp;&amp; (z(3) &lt; floor(spaceHeight * 0.9) <span class="keyword">...</span>
+                &amp;&amp; z(4) &lt; floor(spaceHeight * 0.9)))
+                corr_val = [];
+                <span class="comment">% 2-D correlation template matching with dot dataset</span>
+                <span class="keyword">for</span> jj = 1:length(dotSyms)
+                    temp = imresize(dotSyms{jj},[length(boxHeight1),<span class="keyword">...</span>
+                        length(boxWidth1)]);
+                    corr_val = [corr_val corr2(symTmp, temp)];
+                <span class="keyword">end</span>
+                <span class="comment">% If the maximum correlation coefficient is &gt;= 0.5, dot</span>
+                <span class="comment">% parameters are saved</span>
+                [corrPct, idx] = max(corr_val);
+                <span class="keyword">if</span> (corrPct &gt;= 0.5)
+                    symbol{symCount} = symTmp;
+                    loc(symCount) = {[ceil(z(2)) h ceil(z(1)) w]};
+                    category(symCount) = dotSyms(idx,2);
+                    type(symCount) = dotSyms(idx,3);
+                    value(symCount) = dotSyms(idx,4);
+                    symIdx(symCount) = {ceil(z(1))};
+                    symCount = symCount + 1;
+                    <span class="keyword">if</span> (debug == 1)
+                        rectangle(<span class="string">'Position'</span>,stats(j).BoundingBox, <span class="keyword">...</span>
+                            <span class="string">'EdgeColor'</span>,<span class="string">'#77AC30'</span>, <span class="string">'LineWidth'</span>,2);
+                    <span class="keyword">end</span>
+                    newSection(boxHeight1, boxWidth1) = symTmp;
+                <span class="keyword">end</span>
+            <span class="comment">% If component's length or width is bigger than spaceheight,</span>
+            <span class="comment">% use the rest of the dataset</span>
+            <span class="keyword">else</span>
+                corr_val = [];
+                <span class="comment">% 2-D correlation template matching with combined dataset</span>
+                <span class="comment">% (rest/accidental/fermata)</span>
+                <span class="keyword">for</span> jj = 1:length(combinedSyms)
+                    temp = imresize(combinedSyms{jj},[length(<span class="keyword">...</span>
+                        boxHeight1), length(boxWidth1)]);
+                    corr_val = [corr_val corr2(symTmp, temp)];
+                <span class="keyword">end</span>
+                <span class="comment">% If the maximum correlation coefficient is &gt;= 0.6, symbol</span>
+                <span class="comment">% parameters are saved</span>
+                [corrPct, idx] = max(corr_val);
+                <span class="keyword">if</span> (corrPct &gt;= 0.6)
+                    newSection(boxHeight1, boxWidth1) = section(<span class="keyword">...</span>
+                        boxHeight1, boxWidth1);
+                    <span class="comment">% In the case of flat symbol, the hole is extracted</span>
+                    <span class="comment">% to be used in phase 3</span>
+                    <span class="keyword">if</span> (strcmp(cell2mat(combinedSyms(idx,3)), <span class="string">'flat'</span>))
+                        flatImg = ones(size(section));
+                        flatImg(boxHeight1, boxWidth1) = section(<span class="keyword">...</span>
+                            boxHeight1, boxWidth1);
+                        flatImg = ~xor(imfill(~flatImg, <span class="string">'holes'</span>), flatImg);
+                        flatStats = regionprops(flatImg, <span class="string">'BoundingBox'</span>);
+                        z = flatStats(1).BoundingBox;
+                        stats(j).BoundingBox = z;
+                        h = ceil(z(2))+z(4);
+                        w = ceil(z(1))+z(3);
+                        boxHeight1 = ceil(z(2)):h;
+                        boxWidth1 = ceil(z(1)):w;
+                        symTmp = ~flatImg(boxHeight1, boxWidth1);
+                    <span class="keyword">end</span>
+                    symbol{symCount} = symTmp;
+                    loc(symCount) = {[ceil(z(2)) h ceil(z(1)) w]};
+                    category(symCount) = combinedSyms(idx,2);
+                    type(symCount) = combinedSyms(idx,3);
+                    value(symCount) = combinedSyms(idx,4);
+                    symIdx(symCount) = {ceil(z(1))};
+                    symCount = symCount + 1;
+                    <span class="keyword">if</span> (debug == 1)
+                        rectangle(<span class="string">'Position'</span>,stats(j).BoundingBox, <span class="keyword">...</span>
+                            <span class="string">'EdgeColor'</span>,<span class="string">'#77AC30'</span>, <span class="string">'LineWidth'</span>,2);
+                    <span class="keyword">end</span>
+                <span class="keyword">end</span>
+            <span class="keyword">end</span>
+        <span class="keyword">end</span>
+    <span class="keyword">end</span>
+
+    <span class="comment">% If they exist, combine parameters for non-note definitions</span>
+    <span class="keyword">if</span> (~isempty(symbol))
+        otherSymsTmp = [symbol', loc', category', type', value', symIdx'];
+        otherSymsArr = sortrows(otherSymsTmp,6);
+    <span class="keyword">else</span>
+        otherSymsArr = [];
+    <span class="keyword">end</span>
+<span class="keyword">end</span>
+</pre><pre class="codeoutput error">Not enough input arguments.
+
+Error in otherSymsVert (line 12)
+    newSection = ones(size(section));
+</pre><p class="footer"><br><a href="https://www.mathworks.com/products/matlab/">Published with MATLAB&reg; R2020b</a><br></p></div><!--
+##### SOURCE BEGIN #####
+%REPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASH-
+% Function name:    otherSymsVert
+% Input arg(s):     non-note section, staff space/line heights, non-note
+%                   dataset except tie/slur 
+% Outputs arg(s):   other symbols and section with detected symbols
+% Description:      Detects non-note symbols after vertical connection
+%                   of components
+%REPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASH-
+function [otherSymsArr, newSection] = otherSymsVert(section, stats, ...
+    spaceHeight, combinedSyms, dotSyms, debug)
+    
+    newSection = ones(size(section));
+    symbol = {};
+    loc = {};
+    category = {};
+    type = {};
+    value = {}; 
+    symIdx = {};
+    symCount = 1;
+
+    % Goes through the image based on individual bounding boxes
+    for j = 1:numel(stats)
+        % Extract component boundaries
+        z = stats(j).BoundingBox;
+        h = ceil(z(2))+ceil(z(4));
+        w = ceil(z(1))+ceil(z(3));
+        % Limits the boundaries when it reaches upper/lower bounds
+        if (h < 1)
+            h = 1;
+        elseif (w < 1)
+            w = 1;
+        elseif (h >= size(section,1))
+            h = size(section,1)-1;
+        elseif (w >= size(section,2))
+            w = size(section,2)-1;
+        end
+        boxHeight1 = ceil(z(2)):h;
+        boxWidth1 = ceil(z(1)):w;
+        
+        % Isolate component before template matching
+        symTmp = section(boxHeight1, boxWidth1);
+        
+        % Check if component meets the height and width criteria
+        if ((z(3) >= 3 && z(3) <= 3.5*spaceHeight) && ...
+            (z(4) >= 3 && z(4) <= 6*spaceHeight))
+            % Potential dots are smaller than spaceheight, and the 
+            % absolute difference between the length and width is 1
+            if(((z(3)-z(4) == 1) || (z(3)-z(4) == -1) || ...
+                (z(3)-z(4) == 0)) && (z(3) < floor(spaceHeight * 0.9) ...
+                && z(4) < floor(spaceHeight * 0.9)))
+                corr_val = [];
+                % 2-D correlation template matching with dot dataset
+                for jj = 1:length(dotSyms)
+                    temp = imresize(dotSyms{jj},[length(boxHeight1),...
+                        length(boxWidth1)]);
+                    corr_val = [corr_val corr2(symTmp, temp)];
+                end
+                % If the maximum correlation coefficient is >= 0.5, dot
+                % parameters are saved            
+                [corrPct, idx] = max(corr_val);
+                if (corrPct >= 0.5)
+                    symbol{symCount} = symTmp;
+                    loc(symCount) = {[ceil(z(2)) h ceil(z(1)) w]};
+                    category(symCount) = dotSyms(idx,2);
+                    type(symCount) = dotSyms(idx,3);
+                    value(symCount) = dotSyms(idx,4);
+                    symIdx(symCount) = {ceil(z(1))};
+                    symCount = symCount + 1;    
+                    if (debug == 1)
+                        rectangle('Position',stats(j).BoundingBox, ...
+                            'EdgeColor','#77AC30', 'LineWidth',2);
+                    end
+                    newSection(boxHeight1, boxWidth1) = symTmp;
+                end
+            % If component's length or width is bigger than spaceheight, 
+            % use the rest of the dataset 
+            else
+                corr_val = [];
+                % 2-D correlation template matching with combined dataset
+                % (rest/accidental/fermata)
+                for jj = 1:length(combinedSyms)
+                    temp = imresize(combinedSyms{jj},[length(...
+                        boxHeight1), length(boxWidth1)]);
+                    corr_val = [corr_val corr2(symTmp, temp)];                    
+                end
+                % If the maximum correlation coefficient is >= 0.6, symbol
+                % parameters are saved
+                [corrPct, idx] = max(corr_val);
+                if (corrPct >= 0.6)
+                    newSection(boxHeight1, boxWidth1) = section(...
+                        boxHeight1, boxWidth1);
+                    % In the case of flat symbol, the hole is extracted 
+                    % to be used in phase 3
+                    if (strcmp(cell2mat(combinedSyms(idx,3)), 'flat'))
+                        flatImg = ones(size(section));
+                        flatImg(boxHeight1, boxWidth1) = section(...
+                            boxHeight1, boxWidth1);
+                        flatImg = ~xor(imfill(~flatImg, 'holes'), flatImg);
+                        flatStats = regionprops(flatImg, 'BoundingBox');
+                        z = flatStats(1).BoundingBox;
+                        stats(j).BoundingBox = z;
+                        h = ceil(z(2))+z(4);
+                        w = ceil(z(1))+z(3);
+                        boxHeight1 = ceil(z(2)):h;
+                        boxWidth1 = ceil(z(1)):w;
+                        symTmp = ~flatImg(boxHeight1, boxWidth1);
+                    end
+                    symbol{symCount} = symTmp;
+                    loc(symCount) = {[ceil(z(2)) h ceil(z(1)) w]};
+                    category(symCount) = combinedSyms(idx,2);
+                    type(symCount) = combinedSyms(idx,3);
+                    value(symCount) = combinedSyms(idx,4);
+                    symIdx(symCount) = {ceil(z(1))};
+                    symCount = symCount + 1;
+                    if (debug == 1)
+                        rectangle('Position',stats(j).BoundingBox, ...
+                            'EdgeColor','#77AC30', 'LineWidth',2);
+                    end  
+                end
+            end
+        end     
+    end
+    
+    % If they exist, combine parameters for non-note definitions
+    if (~isempty(symbol))
+        otherSymsTmp = [symbol', loc', category', type', value', symIdx'];
+        otherSymsArr = sortrows(otherSymsTmp,6);
+    else
+        otherSymsArr = [];
+    end
+end
+##### SOURCE END #####
+--></body></html>

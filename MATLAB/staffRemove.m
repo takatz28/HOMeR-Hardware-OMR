@@ -59,7 +59,6 @@ function [imgNoStaff] = staffRemove(img_bw, staffLines, staffHeights, ...
     end
     
     % Put the holes back in the no-staff image
-%     tempImg3 = imerode(tempImg2, strel('square',4));
     imgNoStaff = ~xor(imgNoStaff,tempImg2);
 
 end
