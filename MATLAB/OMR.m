@@ -1,6 +1,6 @@
 function OMR(inputImg, fid1, fid2)
     
-    debug = 1;
+    debug = 0;
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     %%%%%%%         PHASE ONE: PREPROCESSING         %%%%%%%
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -26,7 +26,7 @@ function OMR(inputImg, fid1, fid2)
     for i = 1:length(sections)
         fprintf("-----------------------------------------------------------------\n");
         fprintf("    Section %d symbols: \n", i);
-        imshow(sections{i}); pause;
+        imshow(sections{i});
 
         % Part 2.3: Clef detection
         [clefs, clefBound]  = detectClefs(sections{i}, spaceHeight, ... 
@@ -59,7 +59,7 @@ function OMR(inputImg, fid1, fid2)
         else
             nextBound = timeSigBound;
         end
-        disp(timeSignature);
+        disp(timeSignature); pause;
         % Part 2.6: Section sorting to unbeamed/beamed notes, and other symbols
         [unbeamedSec, beamedSec, otherSymsSec] = noteSorter(sections{i}, ...
             nextBound, spaceHeight, lineHeight);

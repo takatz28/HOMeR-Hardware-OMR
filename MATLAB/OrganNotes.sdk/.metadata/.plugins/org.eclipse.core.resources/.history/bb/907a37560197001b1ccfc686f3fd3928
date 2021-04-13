@@ -8,10 +8,11 @@
 
 #include "intc_handler.h"
 #include "audio.h"
-#include "sheetBeat25.h"
-#include "sheetNotes25.h"
+#include "sheetBeat.h"
+#include "sheetNotes.h"
 
 #define LENGTH 	sizeof(beatArray)/sizeof(beatArray[0])
+//#define TEMPO 450000
 #define TEMPO 1750000
 
 static int tempo = TEMPO;
