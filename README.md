@@ -18,14 +18,12 @@ From the Abstract section of the thesis "Hardware/Software Co-design of an Optic
 
 
 ### Video Demonstrations
-* _Synthesizer_
-  The tune files being read by the synthesizer were hardcoded to test its capabilities before final integration.
+* _Synthesizer_: The tune files being read by the synthesizer were hardcoded to test its capabilities before final integration.
   * [Flight of the Bumblebee]
   * [Tetris Theme Song]
   * [The Girl From Ipanema]
   * [You Are The Sunshine of my Life]
-* _ HOMeR App_
-  The following videos demonstrate various test cases for the HOMeR app.
+* _ HOMeR App_: The following videos demonstrate various test cases for the HOMeR app.
   * Single image:
 	* [Greensleeves]
     * [In the Hall of the Mountain King]
