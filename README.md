@@ -23,6 +23,7 @@ From the Abstract section of the thesis "Hardware/Software Co-design of an Optic
   * [Tetris Theme Song]
   * [The Girl From Ipanema]
   * [You Are The Sunshine of my Life]
+  
 * _ HOMeR App_: The following videos demonstrate various test cases for the HOMeR app.
   * Single image:
 	* [Greensleeves]
