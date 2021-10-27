@@ -1,4 +1,5 @@
 # HOMeR: Hardware Optical Music Recognition
+For a complete description of the overall design, click [here].
 
 From the Abstract section of the thesis "Hardware/Software Co-design of an Optical Music Recognition System":
 
@@ -9,15 +10,21 @@ From the Abstract section of the thesis "Hardware/Software Co-design of an Optic
 > HOMeR was able to process sheet music images of different types and sizes with high accuracy and fast run times, both for pre- and post- correction.
 
 
-### Synthesizer Test Videos
+### Requirements
+
+
+### Features
+
+
+
+### Video Demonstrations
+* _Synthesizer_
 The tune files being read by the synthesizer were hardcoded to test its capabilities before final integration.
   * [Flight of the Bumblebee]
   * [Tetris Theme Song]
   * [The Girl From Ipanema]
   * [You Are The Sunshine of my Life]
-
-  
-### HOMeR App Test Videos
+* _ HOMeR App_
 The following videos demonstrate various test cases for the HOMeR app.
   * Single image:
 	* [Greensleeves]
@@ -26,7 +33,6 @@ The following videos demonstrate various test cases for the HOMeR app.
   * Multiple images:
     * [Amazing Grace]
 
-For a complete description of the overall design, click [here].
 
   
 [here]:
