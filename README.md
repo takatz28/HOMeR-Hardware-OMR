@@ -10,10 +10,8 @@ From the Abstract section of the thesis "Hardware/Software Co-design of an Optic
 > HOMeR was able to process sheet music images of different types and sizes with high accuracy and fast run times, both for pre- and post- correction.
 ---------------------------------------
 ### Requirements
-
-
-### Features
-
+* Software
+* Hardware
 
 
 ### Video Demonstrations
