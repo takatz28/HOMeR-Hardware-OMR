@@ -1,4 +1,11 @@
-# HOMeR: Hardware Optical Music Recognizer
+# HOMeR: Hardware Optical Music Recognition
+
+
+
+For a complete description of the overall design, click [here].
+
+
+
 
 ### Synthesizer Test Videos
 The tune files being read by the synthesizer were hardcoded to test its capabilities before final integration.
@@ -17,7 +24,11 @@ The following videos demonstrate various test cases for the HOMeR app.
   * Multiple images:
     * [Amazing Grace]
 
+
+
   
+[here]:
+https://drive.google.com/file/d/1sfMDNLTtfQq3ZvBRsBOUUY3n6wHFgWAe/view?usp=sharing
 [Greensleeves]:
 https://drive.google.com/file/d/14uhCoezqQO5v1ydMc-PGA70H_gl-lwgg/view?usp=sharing
 [In the Hall of the Mountain King]:
