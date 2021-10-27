@@ -1,7 +1,7 @@
 # HOMeR: Hardware Optical Music Recognizer
 
 ### Synthesizer Test Videos
-The tune files being read by the program were hardcoded to test the synthesizer's capabilities before integrating it to the overall design.
+The tune files being read by the synthesizer were hardcoded to test its capabilities before final integration.
   * [Flight of the Bumblebee]
   * [Tetris Theme Song]
   * [The Girl From Ipanema]
@@ -9,6 +9,7 @@ The tune files being read by the program were hardcoded to test the synthesizer'
 
   
 ### HOMeR App Test Videos
+The following videos demonstrate various test cases for the HOMeR app.
   * Single image:
 	* [Greensleeves]
     * [In the Hall of the Mountain King]
