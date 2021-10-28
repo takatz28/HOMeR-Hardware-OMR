@@ -22,7 +22,9 @@ From the thesis "Hardware/Software Co-design of an Optical Music Recognition Sys
 ## Initial Setup
 ```
 1. test1
+
 2. test2
+
 3. test3
 ```
 
