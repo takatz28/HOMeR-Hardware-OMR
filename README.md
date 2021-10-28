@@ -37,11 +37,11 @@ From the thesis "Hardware/Software Co-design of an Optical Music Recognition Sys
     * [Amazing Grace]
 
 ## Other Resources
-  <details><summary>System Setup
+  <details><summary>System Setup</summary>
   <p>
   <img align='center' width="600" height = "600" src="https://github.com/takatz28/HOMeR-Hardware-OMR/blob/master/docs/Setup.jpg"></img>
   </p>
-  </summary></details>
+  </details>
   
 [here]:
 https://drive.google.com/file/d/1sfMDNLTtfQq3ZvBRsBOUUY3n6wHFgWAe/view?usp=sharing
