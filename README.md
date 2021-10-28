@@ -13,8 +13,8 @@ From the thesis "Hardware/Software Co-design of an Optical Music Recognition Sys
 ---------------------------------------
 ## Requirements
 * Software
-  * MATLAB R2019a or later
-  * Vivado Design Suite 2019.1 (primarily Xilinx SDK)
+  * [MATLAB] R2019a or later 
+  * [Vivado] Design Suite 2019.1 (primarily Xilinx SDK)
   * Digilent Support [Board Files] for Vivado
 * Hardware
   * Zybo Z7: Zynq-7000 ARM/FPGA SoC Development Board (Z7-20 variant)
@@ -55,6 +55,11 @@ From the thesis "Hardware/Software Co-design of an Optical Music Recognition Sys
 	</p>
   </details>
   
+  
+[MATLAB]:
+https://www.mathworks.com/products/matlab/student.html?s_tid=htb_learn_gtwy_cta3
+[Vivado]:
+https://www.xilinx.com/support/download/index.html/content/xilinx/en/downloadNav/vivado-design-tools/archive.html
 [here]:
 https://drive.google.com/file/d/1sfMDNLTtfQq3ZvBRsBOUUY3n6wHFgWAe/view?usp=sharing
 [Board Files]:
