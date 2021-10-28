@@ -37,7 +37,7 @@ From the thesis "Hardware/Software Co-design of an Optical Music Recognition Sys
     * [Amazing Grace]
 
 ## Other Resources
-* <details><summary>Block diagram</details></summary>
+  <details><summary>Block diagram</details></summary>
   
 [here]:
 https://drive.google.com/file/d/1sfMDNLTtfQq3ZvBRsBOUUY3n6wHFgWAe/view?usp=sharing
