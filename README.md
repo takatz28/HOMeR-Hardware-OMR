@@ -45,7 +45,7 @@ From the thesis "Hardware/Software Co-design of an Optical Music Recognition Sys
   
   <details><summary>Block Diagram</summary>
 	<p align="center">
-	  <img width="500" height="200" src="https://github.com/takatz28/HOMeR-Hardware-OMR/blob/master/docs/HOMeR.jpg">
+	  <img width="500" height="150" src="https://github.com/takatz28/HOMeR-Hardware-OMR/blob/master/docs/HOMeR.jpg">
 	</p>
   </details>
   
