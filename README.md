@@ -20,6 +20,11 @@ From the thesis "Hardware/Software Co-design of an Optical Music Recognition Sys
   * Speaker with an AUX connection
 
 ## Initial Setup
+<code>
+1.
+2.
+3.
+</code>
 
 ## Demonstrations
 * _Synthesizer_: The tune files being read by the synthesizer were hardcoded to test its capabilities before final integration.
