@@ -42,11 +42,13 @@ From the thesis "Hardware/Software Co-design of an Optical Music Recognition Sys
 	  <img width="500" height="500" src="https://github.com/takatz28/HOMeR-Hardware-OMR/blob/master/docs/Setup.jpg">
 	</p>
   </details>
-  <details><summary>System Setup</summary>
+  
+  <details><summary>Block Diagram</summary>
 	<p align="center">
 	  <img width="500" height="200" src="  https://github.com/takatz28/HOMeR-Hardware-OMR/blob/master/docs/HOMeR.jpg">
 	</p>
   </details>
+  
 [here]:
 https://drive.google.com/file/d/1sfMDNLTtfQq3ZvBRsBOUUY3n6wHFgWAe/view?usp=sharing
 [Greensleeves]:
