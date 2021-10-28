@@ -55,9 +55,9 @@ From the thesis "Hardware/Software Co-design of an Optical Music Recognition Sys
 	</p>
   </details>
   
-[Board Files]:
+[here]:
 https://drive.google.com/file/d/1sfMDNLTtfQq3ZvBRsBOUUY3n6wHFgWAe/view?usp=sharing
-[link]:
+[Board Files]:
 https://digilent.com/reference/programmable-logic/guides/install-board-files
 [Greensleeves]:
 https://drive.google.com/file/d/14uhCoezqQO5v1ydMc-PGA70H_gl-lwgg/view?usp=sharing
