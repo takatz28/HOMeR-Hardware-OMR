@@ -38,8 +38,10 @@ From the thesis "Hardware/Software Co-design of an Optical Music Recognition Sys
 
 ## Other Resources
   <details><summary>System Setup
-  <img align='center' width="800" height = "600" src="https://github.com/takatz28/HOMeR-Hardware-OMR/blob/master/docs/Setup.jpg"></img>
-</summary></details>
+  <p>
+  <img align='center' width="600" height = "600" src="https://github.com/takatz28/HOMeR-Hardware-OMR/blob/master/docs/Setup.jpg"></img>
+  </p>
+  </summary></details>
   
 [here]:
 https://drive.google.com/file/d/1sfMDNLTtfQq3ZvBRsBOUUY3n6wHFgWAe/view?usp=sharing
