@@ -21,12 +21,9 @@ From the thesis "Hardware/Software Co-design of an Optical Music Recognition Sys
 
 ## Initial Setup
 <code>
-1. 
-
-2. 
-
-3. 
-
+1. test1
+2. test2
+3. test3
 </code>
 
 ## Demonstrations
