@@ -1,7 +1,9 @@
 # HOMeR: Hardware Optical Music Recognition
 For a complete description of the overall design, click [here].
 
-From the Abstract section of the thesis "Hardware/Software Co-design of an Optical Music Recognition System":
+
+## Abstract
+From the thesis "Hardware/Software Co-design of an Optical Music Recognition System":
 
 > The objective of the project presented herein is to provide a co-design approach to the general optical music recognition (OMR) framework. The proposed system aims to be the first step towards a full-fledged hardware implementation of a music recognizer.
 
@@ -9,7 +11,7 @@ From the Abstract section of the thesis "Hardware/Software Co-design of an Optic
 
 > HOMeR was able to process sheet music images of different types and sizes with high accuracy and fast run times, both for pre- and post- correction.
 ---------------------------------------
-### Requirements
+## Requirements
 * Software
   * MATLAB R2019a or later
   * Vivado 2019.1
@@ -18,7 +20,9 @@ From the Abstract section of the thesis "Hardware/Software Co-design of an Optic
   * Zybo Z7: Zynq-7000 ARM/FPGA SoC Development Board (Z7-20 variant)
   * Speaker with an AUX connection
 
-### Video Demonstrations
+## Instructions
+
+## Demonstrations
 * _Synthesizer_: The tune files being read by the synthesizer were hardcoded to test its capabilities before final integration.
   * [Flight of the Bumblebee]
   * [Tetris Theme Song]
@@ -32,7 +36,7 @@ From the Abstract section of the thesis "Hardware/Software Co-design of an Optic
   * Multiple images:
     * [Amazing Grace]
 
-
+## Other Resources
   
 [here]:
 https://drive.google.com/file/d/1sfMDNLTtfQq3ZvBRsBOUUY3n6wHFgWAe/view?usp=sharing
