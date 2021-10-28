@@ -11,8 +11,12 @@ From the Abstract section of the thesis "Hardware/Software Co-design of an Optic
 ---------------------------------------
 ### Requirements
 * Software
+  * MATLAB R2019a or later
+  * Vivado 2019.1
+  * Xilinx SDK 2019.1
 * Hardware
-
+  * Zybo Z7: Zynq-7000 ARM/FPGA SoC Development Board (Z7-20 variant)
+  * Speaker with an AUX connection
 
 ### Video Demonstrations
 * _Synthesizer_: The tune files being read by the synthesizer were hardcoded to test its capabilities before final integration.
