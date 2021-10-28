@@ -51,7 +51,7 @@ From the thesis "Hardware/Software Co-design of an Optical Music Recognition Sys
   
   <details><summary>HOMeR Sample Output</summary>
 	<p align="center">
-	  <img width="600" height="600" src="https://github.com/takatz28/HOMeR-Hardware-OMR/blob/master/docs/minuet.jpg">
+	  <img width="500" height="600" src="https://github.com/takatz28/HOMeR-Hardware-OMR/blob/master/docs/minuet.jpg">
 	</p>
   </details>
   
