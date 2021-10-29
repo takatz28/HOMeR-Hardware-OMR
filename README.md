@@ -31,6 +31,11 @@ From the thesis "Hardware/Software Co-design of an Optical Music Recognition Sys
 8. Click on _Run_ _As_ &gt; _Launch_ _On_ _Hardware_ _(GDB)_.
 9. Push the BTN1 button on the board to listen to the audio version of the images.
 
+## Notes
+* Launch On Hardware must be performed after every image read.
+* The board need not to be re-programmed every read, unless the audio produces undesirable results.
+
+
 ## Demonstrations
 * _Synthesizer_: The tune files being read by the synthesizer were hardcoded to test its capabilities before final integration.
   * [Flight of the Bumblebee]
