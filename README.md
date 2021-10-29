@@ -15,7 +15,6 @@ From the thesis "Hardware/Software Co-design of an Optical Music Recognition Sys
 * Software
   * [MATLAB] R2019a or later 
   * [Vivado] Design Suite 2019.1 (primarily Xilinx SDK and Vivado)
-  * Digilent Support [Board Files] for Vivado
 * Hardware
   * [Zybo] Z7: Zynq-7000 ARM/FPGA SoC Development Board (Z7-20 variant)
   * Speaker with an AUX connection
@@ -107,8 +106,6 @@ https://www.mathworks.com/products/matlab/student.html?s_tid=htb_learn_gtwy_cta3
 https://www.xilinx.com/support/download/index.html/content/xilinx/en/downloadNav/vivado-design-tools/archive.html
 [Zybo]:
 https://digilent.com/shop/zybo-z7-zynq-7000-arm-fpga-soc-development-board/
-[Board Files]:
-https://digilent.com/reference/programmable-logic/guides/install-board-files
 [Greensleeves]:
 https://drive.google.com/file/d/14uhCoezqQO5v1ydMc-PGA70H_gl-lwgg/view?usp=sharing
 [In the Hall of the Mountain King]:
