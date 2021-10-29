@@ -22,7 +22,7 @@ From the thesis "Hardware/Software Co-design of an Optical Music Recognition Sys
 ## Setup Instructions
 1. Download the required software.
 2. Clone the repository.
-3. Open the `HOMeR.mlapp` within the `HOMeR` folder. Make sure that the current workspace is the same folder.
+3. Open the `HOMeR.mlapp` within the `HOMeR` folder. Make sure that the current MATLAB workspace is the same folder.
 4. Select sheet music image(s) to be read, then click on the _Read_ _Score_ button.
 5. Once the processing is complete, open Xilinx SDK. When prompted for the workspace, select the `OrganNotes.sdk` folder.
 6. Connect the Zybo board to the computer using a micro-USB cable. Insert one end of an AUX cord to the HPH OUT port of the board, and the other to the speaker.
