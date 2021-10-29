@@ -1,5 +1,5 @@
 # HOMeR: Hardware Optical Music Recognition
-For a complete description of the overall design, click [here].
+For a complete description of the project, click [here].
 
 
 ## Abstract
