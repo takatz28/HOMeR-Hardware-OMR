@@ -22,7 +22,7 @@ From the thesis "Hardware/Software Co-design of an Optical Music Recognition Sys
 ## Setup Instructions
 1. Download the required software.
 2. Clone the repository.
-3. Open the `HOMeR.mlapp` within the HOMeR folder. Make sure that the current workspace is the HOMeR folder.
+3. Open the `HOMeR.mlapp` within the `HOMeR` folder. Make sure that the current workspace is the same older.
 4. Select sheet music image(s) to be read, then click on the _Read_ _Score_ button.
 5. Once the processing is complete, open Xilinx SDK. When prompted for the workspace, select the `OrganNotes.sdk` folder.
 6. Connect the Zybo board to the computer using a micro-USB cable. Insert one end of an AUX cord to the HPH OUT port of the board, and the other to the speaker.
@@ -42,7 +42,7 @@ source ./OrganNotes.tcl
 ```
 4. Once the project is created, modify the IP through the Block Design section.
 5. Create a new HDL wrapper for the block design, then generate the bitstream.
-6. Go to File &gt; Export &gt; Export Hardware. Make sure that the "Include Bitstream" box is marked, and the "Export to" location is the 1OrganNotes.sdk1 folder.
+6. Go to File &gt; Export &gt; Export Hardware. Make sure that the "Include Bitstream" box is marked, and the "Export to" location is the `OrganNotes.sdk` folder.
 7. Go to File &gt; Launch SDK. Change both "Exported location" and "Workspace" to `OrganNotes.sdk`, then click OK.
 8. Once the SDK is launched, go to File &gt; New &gt; Application Project.
 9. Fill up the form with the following details:
