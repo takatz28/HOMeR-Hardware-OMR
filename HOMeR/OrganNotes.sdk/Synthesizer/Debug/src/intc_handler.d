@@ -25,7 +25,7 @@ src/intc_handler.o src/intc_handler.o: ../src/intc_handler.c \
  ../../Synthesizer_bsp/ps7_cortexa9_0/include/xiicps_hw.h \
  ../../Synthesizer_bsp/ps7_cortexa9_0/include/xplatform_info.h \
  ../../Synthesizer_bsp/ps7_cortexa9_0/include/sleep.h ../src/notes.h \
- ../src/audio.h ../src/song5.h
+ ../src/audio.h ../src/sheetBeat.h ../src/sheetNotes.h
 
 ../src/intc_handler.h:
 
@@ -85,4 +85,6 @@ src/intc_handler.o src/intc_handler.o: ../src/intc_handler.c \
 
 ../src/audio.h:
 
-../src/song5.h:
+../src/sheetBeat.h:
+
+../src/sheetNotes.h:

@@ -2566,3 +2566,40 @@ make pre-build main-build
 a9-linaro-pre-build-step
 ' '
 make: Nothing to be done for 'main-build'.
+00:26:16 **** Auto Build of configuration Debug for project Synthesizer ****
+make pre-build main-build 
+a9-linaro-pre-build-step
+' '
+'Building file: ../src/intc_handler.c'
+'Invoking: ARM v7 gcc compiler'
+arm-none-eabi-gcc -Wall -O0 -g3 -c -fmessage-length=0 -MT"src/intc_handler.o" -mcpu=cortex-a9 -mfpu=vfpv3 -mfloat-abi=hard -I../../Synthesizer_bsp/ps7_cortexa9_0/include -MMD -MP -MF"src/intc_handler.d" -MT"src/intc_handler.o" -o "src/intc_handler.o" "../src/intc_handler.c"
+In file included from ../src/intc_handler.c:12:
+../src/sheetNotes.h:3:1: error: expected expression before 'int'
+ int noteArray[][9] =
+ ^~~
+make: *** [src/subdir.mk:32: src/intc_handler.o] Error 1
+00:26:51 **** Auto Build of configuration Debug for project Synthesizer ****
+make pre-build main-build 
+a9-linaro-pre-build-step
+' '
+'Building file: ../src/intc_handler.c'
+'Invoking: ARM v7 gcc compiler'
+arm-none-eabi-gcc -Wall -O0 -g3 -c -fmessage-length=0 -MT"src/intc_handler.o" -mcpu=cortex-a9 -mfpu=vfpv3 -mfloat-abi=hard -I../../Synthesizer_bsp/ps7_cortexa9_0/include -MMD -MP -MF"src/intc_handler.d" -MT"src/intc_handler.o" -o "src/intc_handler.o" "../src/intc_handler.c"
+'Finished building: ../src/intc_handler.c'
+' '
+'Building target: Synthesizer.elf'
+'Invoking: ARM v7 gcc linker'
+arm-none-eabi-gcc -mcpu=cortex-a9 -mfpu=vfpv3 -mfloat-abi=hard -Wl,-build-id=none -specs=Xilinx.spec -Wl,-T -Wl,../src/lscript.ld -L../../Synthesizer_bsp/ps7_cortexa9_0/lib -o "Synthesizer.elf"  ./src/audio.o ./src/driver.o ./src/init.o ./src/intc_handler.o   -Wl,--start-group,-lxil,-lgcc,-lc,--end-group
+'Finished building target: Synthesizer.elf'
+' '
+'Invoking: ARM v7 Print Size'
+arm-none-eabi-size Synthesizer.elf  |tee "Synthesizer.elf.size"
+   text	   data	    bss	    dec	    hex	filename
+  48356	   5232	  23480	  77068	  12d0c	Synthesizer.elf
+'Finished building: Synthesizer.elf.size'
+' '
+00:27:31 **** Incremental Build of configuration Debug for project Synthesizer ****
+make pre-build main-build 
+a9-linaro-pre-build-step
+' '
+make: Nothing to be done for 'main-build'.
