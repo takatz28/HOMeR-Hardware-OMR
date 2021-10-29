@@ -17,10 +17,19 @@ From the thesis "Hardware/Software Co-design of an Optical Music Recognition Sys
   * [Vivado] Design Suite 2019.1 (primarily Xilinx SDK)
   * Digilent Support [Board Files] for Vivado
 * Hardware
-  * Zybo Z7: Zynq-7000 ARM/FPGA SoC Development Board (Z7-20 variant)
+  * [Zybo] Z7: Zynq-7000 ARM/FPGA SoC Development Board (Z7-20 variant)
   * Speaker with an AUX connection
 
-## Initial Setup
+## Setup Instructions
+1. Download the required software.
+2. Clone the repository.
+3. Open the _HOMeR.mlapp_ within the HOMeR folder.
+4. Select sheet music image(s) to be read, then click on the _Read_ _Score_ button.
+5. Once the processing is complete, open Xilinx SDK. 
+...When prompted for the workspace, select the _OrganNotes.sdk_ folder.
+6. Connect the Zybo board to the computer using a micro-USB cord. Insert one end of an AUX cord to the HPH OUT port of the board, and the other to the speaker.
+7. Program the FPGA.
+8. Click ok _Run_ _As_ &gt; _Launch_ _On_ _Hardware_ _(GDB)_.
 
 ## Demonstrations
 * _Synthesizer_: The tune files being read by the synthesizer were hardcoded to test its capabilities before final integration.
@@ -56,12 +65,14 @@ From the thesis "Hardware/Software Co-design of an Optical Music Recognition Sys
   </details>
   
   
+[here]:
+https://drive.google.com/file/d/1sfMDNLTtfQq3ZvBRsBOUUY3n6wHFgWAe/view?usp=sharing
 [MATLAB]:
 https://www.mathworks.com/products/matlab/student.html?s_tid=htb_learn_gtwy_cta3
 [Vivado]:
 https://www.xilinx.com/support/download/index.html/content/xilinx/en/downloadNav/vivado-design-tools/archive.html
-[here]:
-https://drive.google.com/file/d/1sfMDNLTtfQq3ZvBRsBOUUY3n6wHFgWAe/view?usp=sharing
+[Zybo]:
+https://digilent.com/shop/zybo-z7-zynq-7000-arm-fpga-soc-development-board/
 [Board Files]:
 https://digilent.com/reference/programmable-logic/guides/install-board-files
 [Greensleeves]:
