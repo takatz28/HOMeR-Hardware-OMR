@@ -45,12 +45,17 @@ source ./OrganNotes.tcl
 5. Create a new HDL wrapper for the block design, then generate the bitstream.
 6. Go to File &gt; Export &gt; Export Hardware. Make sure that the "Include Bitstream" box is marked, and the "Export to" location is the *OrganNotes.sdk* folder.
 7. Go to File &gt; Launch SDK. Change both "Exported location" and "Workspace" to *OrganNotes.sdk*, then click OK.
-</details>
 8. Once the SDK is launched, go to File &gt; New &gt; Application Project.
 9. Fill up the form with the following details:
 Field | Value
 --- | :---:
 Project Name | Synthesizer
+OS Platform | Standalone
+Hardware Platform | test_wrapper_hw_platform_0 
+Processor | ps7_cortex a9_0
+Language | C
+Board Suppoer Package | Create New
+</details>
 
 * Launch On Hardware must be performed after every image read.
 * The board need not to be re-programmed every read, unless the audio produces undesirable results.
