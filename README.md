@@ -56,6 +56,10 @@ Hardware Platform | test_wrapper_hw_platform_0
 Processor | ps7_cortex a9_0
 Language | C
 Board Suppoer Package | Create New
+
+10. Click on Next, select the _Empty_ _Application_ template, then click Finish.
+11. Copy the contents of `HOMeR/src` into `OrganNotes.sdk/Synthesizer/src`.
+12. Run the _HOMeR_ app as described in the *Setup* section.
 </details>
 
 * Launch On Hardware must be performed after every image read.
