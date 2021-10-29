@@ -23,7 +23,7 @@ From the thesis "Hardware/Software Co-design of an Optical Music Recognition Sys
 ## Setup Instructions
 1. Download the required software.
 2. Clone the repository.
-3. Open the _HOMeR.mlapp_ within the HOMeR folder.
+3. Open the _HOMeR.mlapp_ within the HOMeR folder. Ensure that the current workspace is the HOMeR folder.
 4. Select sheet music image(s) to be read, then click on the _Read_ _Score_ button.
 5. Once the processing is complete, open Xilinx SDK. When prompted for the workspace, select the _OrganNotes.sdk_ folder.
 6. Connect the Zybo board to the computer using a micro-USB cord. Insert one end of an AUX cord to the HPH OUT port of the board, and the other to the speaker.
@@ -35,6 +35,20 @@ From the thesis "Hardware/Software Co-design of an Optical Music Recognition Sys
 * Launch On Hardware must be performed after every image read.
 * The board need not to be re-programmed every read, unless the audio produces undesirable results.
 
+<details><summary>If the Synthesizer IP core is to be modified, follow these instructions </summary>:
+
+1. Delete the contents of the OrganNotes.sdk folder under HOMeR.
+2. Open Vivado 2019.1.
+3. Using the tcl console, type the following:
+```tcl
+cd <extracted_folder>/Synthesizer
+source ./OrganNotes.tcl
+```
+4. Modify the IP through the Block Design section.
+5. Create a new HDL wrapper for the block design, then generate the bitstream.
+6. Go to File&gt;Export&gt;Export Hardware. Make sure that the _Include_ _Bitstream_ box is marked, and the _Export_ _to_ location is the OrganNotes.sdk folder.
+7. Go to File&gt;Launch SDK. Change both _Exported_ _location_ and _Workspace_ to OrganNotes.sdk, then click OK.
+</details>
 
 ## Demonstrations
 * _Synthesizer_: The tune files being read by the synthesizer were hardcoded to test its capabilities before final integration.
