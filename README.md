@@ -25,14 +25,11 @@ From the thesis "Hardware/Software Co-design of an Optical Music Recognition Sys
 2. Clone the repository.
 3. Open the _HOMeR.mlapp_ within the HOMeR folder.
 4. Select sheet music image(s) to be read, then click on the _Read_ _Score_ button.
-5. Once the processing is complete, open Xilinx SDK.
-
-  ...When prompted for the workspace, select the _OrganNotes.sdk_ folder.
-  
+5. Once the processing is complete, open Xilinx SDK. When prompted for the workspace, select the _OrganNotes.sdk_ folder.
 6. Connect the Zybo board to the computer using a micro-USB cord. Insert one end of an AUX cord to the HPH OUT port of the board, and the other to the speaker.
 7. Program the FPGA.
 8. Click on _Run_ _As_ &gt; _Launch_ _On_ _Hardware_ _(GDB)_.
-9. Push the BTN1 button on the board to listen to the audible version of the images.
+9. Push the BTN1 button on the board to listen to the audio version of the images.
 
 ## Demonstrations
 * _Synthesizer_: The tune files being read by the synthesizer were hardcoded to test its capabilities before final integration.
