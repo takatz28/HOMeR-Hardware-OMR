@@ -28,6 +28,7 @@ From the thesis "Hardware/Software Co-design of an Optical Music Recognition Sys
 5. Once the processing is complete, open Xilinx SDK.
 
   ...When prompted for the workspace, select the _OrganNotes.sdk_ folder.
+  
 6. Connect the Zybo board to the computer using a micro-USB cord. Insert one end of an AUX cord to the HPH OUT port of the board, and the other to the speaker.
 7. Program the FPGA.
 8. Click on _Run_ _As_ &gt; _Launch_ _On_ _Hardware_ _(GDB)_.
