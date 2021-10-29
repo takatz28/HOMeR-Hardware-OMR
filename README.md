@@ -14,7 +14,7 @@ From the thesis "Hardware/Software Co-design of an Optical Music Recognition Sys
 ## Requirements
 * Software
   * [MATLAB] R2019a or later 
-  * [Vivado] Design Suite 2019.1 (primarily Xilinx SDK)
+  * [Vivado] Design Suite 2019.1 (primarily Xilinx SDK and Vivado)
   * Digilent Support [Board Files] for Vivado
 * Hardware
   * [Zybo] Z7: Zynq-7000 ARM/FPGA SoC Development Board (Z7-20 variant)
@@ -32,23 +32,21 @@ From the thesis "Hardware/Software Co-design of an Optical Music Recognition Sys
 9. Push the BTN1 button on the board to listen to the audio version of the images.
 
 ## Notes
-* Launch On Hardware must be performed after every image read.
-* The board need not to be re-programmed every read, unless the audio produces undesirable results.
-
-<details><summary>If the Synthesizer IP core is to be modified, follow these instructions </summary>:
-
-1. Delete the contents of the OrganNotes.sdk folder under HOMeR.
+<details><summary>If the Synthesizer IP core is to be modified, follow these instructions:</summary>
+1. Delete the contents of the *OrganNotes.sdk* folder under _HOMeR_.
 2. Open Vivado 2019.1.
 3. Using the tcl console, type the following:
 ```tcl
-cd <extracted_folder>/Synthesizer
+cd <change to extracted_folder>/Synthesizer/
 source ./OrganNotes.tcl
 ```
-4. Modify the IP through the Block Design section.
+4. Once the project is created, Modify the IP through the Block Design section.
 5. Create a new HDL wrapper for the block design, then generate the bitstream.
-6. Go to File&gt;Export&gt;Export Hardware. Make sure that the _Include_ _Bitstream_ box is marked, and the _Export_ _to_ location is the OrganNotes.sdk folder.
-7. Go to File&gt;Launch SDK. Change both _Exported_ _location_ and _Workspace_ to OrganNotes.sdk, then click OK.
+6. Go to File &gt; Export &gt ;Export Hardware. Make sure that the "Include Bitstream" box is marked, and the "Export to" location is the *OrganNotes.sdk* folder.
+7. Go to File &gt; Launch SDK. Change both "Exported location" and "Workspace" to *OrganNotes.sdk*, then click OK.
 </details>
+* Launch On Hardware must be performed after every image read.
+* The board need not to be re-programmed every read, unless the audio produces undesirable results.
 
 ## Demonstrations
 * _Synthesizer_: The tune files being read by the synthesizer were hardcoded to test its capabilities before final integration.
