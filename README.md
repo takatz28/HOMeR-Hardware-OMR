@@ -66,10 +66,10 @@ Board Support Package | Create New
 
 ## Demonstrations
 * _Synthesizer_: The tune files being read by the synthesizer were hardcoded to test its capabilities before final integration.
+  * [Family Guy Theme Song]
   * [Flight of the Bumblebee]
   * [Tetris Theme Song]
   * [The Girl From Ipanema]
-  * [You Are The Sunshine of my Life]
 * _HOMeR App_: The following videos demonstrate various test cases for the app.
   * Single image:
 	* [Greensleeves]
@@ -99,7 +99,7 @@ Board Support Package | Create New
   
   
 [here]:
-https://drive.google.com/file/d/1sfMDNLTtfQq3ZvBRsBOUUY3n6wHFgWAe/view?usp=sharing
+https://github.com/takatz28/HOMeR-Hardware-OMR/blob/master/docs/Tacata-Louis-thesis-2021_3.pdf
 [MATLAB]:
 https://www.mathworks.com/products/matlab/student.html?s_tid=htb_learn_gtwy_cta3
 [Vivado]:
@@ -107,18 +107,18 @@ https://www.xilinx.com/support/download/index.html/content/xilinx/en/downloadNav
 [Zybo]:
 https://digilent.com/shop/zybo-z7-zynq-7000-arm-fpga-soc-development-board/
 [Greensleeves]:
-https://drive.google.com/file/d/14uhCoezqQO5v1ydMc-PGA70H_gl-lwgg/view?usp=sharing
+https://youtu.be/7BkEfsyD8Jo
 [In the Hall of the Mountain King]:
-https://drive.google.com/file/d/1inY15nAcpwpulG6GEa-EEbANPE5pXs2x/view?usp=sharing
+https://youtu.be/eLixSXhYcRE
 [You Are My Sunshine]:
-https://drive.google.com/file/d/1sL9n_EVkKScEoXfHMqU1KZrMXq_a1d0v/view?usp=sharing
+https://youtu.be/Col3rOFFVdY
 [Amazing Grace]:
-https://drive.google.com/file/d/1pv0Ghh1rKgaRMufB96hQwcvFTqPTBlgw/view?usp=sharing
+https://github.com/takatz28/HOMeR-Hardware-OMR/blob/master/videos/AmazingGrace_TwoSheets.mov
+[Family Guy Theme Song]:
+https://youtube.com/shorts/BvW3B_qzDo4?feature=share
 [Flight of the Bumblebee]:
-https://drive.google.com/file/d/1bX15-7DolUZvAkDcviW_WpkBffbX5UmK/view?usp=sharing
+https://youtu.be/M0TSvHTiTRo
 [Tetris Theme Song]:
-https://drive.google.com/file/d/1VbuS7QhAdDdBe_8DlKGI6_5K2n84xQ28/view?usp=sharing
+https://youtu.be/mpysujrxrNQ
 [The Girl From Ipanema]:
-https://drive.google.com/file/d/14gtuzIP55wYlUJ-fh8lDUJaByMgvlCX-/view?usp=sharing
-[You Are The Sunshine of my Life]:
-https://drive.google.com/file/d/1xnBoizPs20fYIUJMBPO8VAIRHUKl-ZFI/view?usp=sharing
+https://youtu.be/c5kWgiDO32k
