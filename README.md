@@ -113,7 +113,7 @@ https://youtu.be/eLixSXhYcRE
 [You Are My Sunshine]:
 https://youtu.be/Col3rOFFVdY
 [Amazing Grace]:
-https://github.com/takatz28/HOMeR-Hardware-OMR/blob/master/videos/AmazingGrace_TwoSheets.mov
+https://youtu.be/JaCjitubTSw
 [Family Guy Theme Song]:
 https://youtube.com/shorts/BvW3B_qzDo4?feature=share
 [Flight of the Bumblebee]:
